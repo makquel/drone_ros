@@ -1,0 +1,10 @@
+<launch>
+  
+  <node pkg="mavros_extras" type="gcs_image_bridge" name="gcs_image_bridge" clear_params="true" output="screen">
+		<remap from="/mavlink/gcs_image/compressed" to="/camera/image_raw/compressed" />
+		<param name="gcs_url" value="udp://localhost:8001@localhost:14550" />
+		<param name="image_transport" value="compressed"/>
+<!-- 		<remap from="/mavlink/to" to="/droni/mavlink/to" />
+		<remap from="/mavlink/from" to="/droni/mavlink/from" />		 -->
+  </node>
+</launch>

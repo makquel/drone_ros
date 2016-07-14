@@ -1,0 +1,4 @@
+<launch> 
+  <node type="heartbeat" pkg="protomav"  name="heartbeat_node"/>
+  
+</launch>

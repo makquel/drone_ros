@@ -1,0 +1,7 @@
+<launch>
+  <include file="$(find protomav)/launch/nav_test.launch"/>
+  <include file="$(find gps2tf)/launch/gps2tf.launch"/>
+  <include file="$(find protomav)/launch/move_base.launch"/>
+  <include file="$(find ros2mav)/launch/test_mavros.launch"/>
+  <node pkg="rviz" type="rviz" name="rviz"/>
+</launch>

@@ -1,0 +1,13 @@
+system_id: 1 
+comp_id: 240
+
+mav_topic: mavlink/from
+
+imu_topic: /verocarfreedom/xsens/imu
+mag_topic: /verocarfreedom/xsens/magnetic
+vel_topic: /verocarfreedom/xsens/velocity
+gps_topic: /verocarfreedom/xsens/gps_data
+gps_info_topic: /verocarfreedom/xsens/gps_info
+rpy_topic: /verocarfreedom/xsens/rpy
+temp_topic: /verocarfreedom/xsens/temperature
+pressure_topic: /verocarfreedom/xsens/pressure

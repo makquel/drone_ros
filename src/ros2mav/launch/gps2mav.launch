@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="ros2mav" type="gps2mav_node" name="gps2mav_node" output="screen">
+</launch>
