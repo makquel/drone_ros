@@ -2,8 +2,8 @@
 	<!-- vim: ft=xml -->
 	<!-- example launch script for PX4 based FCU's -->
 
-	<arg name="fcu_url" default="udp://localhost:14550@localhost:8001" />
-	<arg name="gcs_url" default="udp://localhost:14552@localhost:14551" />
+	<arg name="fcu_url" default="udp://localhost:8001@localhost:14550" />
+	<arg name="gcs_url" default="" />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="50" />
 

@@ -1,10 +1,11 @@
 #include "MavHeartbeat.h"
+
 using namespace protomav;
+
 MavHeartbeat::MavHeartbeat(){
-  ros::NodeHandle nh("~");
+  ros::NodeHandle nh;
   nh.param<double>("hb_freq", freq, 1.0);
 }
-
 
 void MavHeartbeat::send(){
   
@@ -15,15 +16,11 @@ void MavHeartbeat::send(){
 
 }
 
-
-
 int main(int argc,  char** argv) {
  ros::init(argc, argv, "mav_heartbeat");
 
  MavHeartbeat mhb;
-  
- mhb.run();
- 
+ mhb.run(); 
  
 }
 

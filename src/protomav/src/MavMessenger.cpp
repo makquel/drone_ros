@@ -16,20 +16,10 @@ float MavMessenger::getFreq(){
 }
  		
 void MavMessenger::send(mavlink_message_t mmsg){
-  mavros_msgs::Mavlink mav_msg;
-  mav_msg.header.stamp=ros::Time::now(); 
-  mav_msg.len = mmsg.len;
-  mav_msg.seq = mmsg.seq;
-  mav_msg.sysid = mmsg.sysid;
-  mav_msg.compid = mmsg.compid;
-  mav_msg.msgid = mmsg.msgid;
-  mav_msg.payload64.reserve(((int) mmsg.len + 7) / 8);
-  for (size_t i = 0; i < (mmsg.len + 7) / 8; i++){
-  // ROS_INFO_STREAM(i << ":" <<(uint64_t)(mmsg.payload64[i]));
-    mav_msg.payload64.push_back(mmsg.payload64[i]);
-  }
+  mavros_msgs::Mavlink rmsg;
+  mavros_msgs::mavlink::convert(mmsg, rmsg);
   ROS_DEBUG("Sent Mavlink Message on ROS Topic, msgid: %d", mmsg.msgid);
-  mav_pub.publish(mav_msg); 
+  mav_pub.publish(rmsg); 
 }
 
 void MavMessenger::run(){

@@ -2,7 +2,7 @@
 #define MAV_CONTROL_HEADER
 
 #include <mavros_msgs/Mavlink.h>
-#include "mavlink/common/mavlink.h"
+#include <mavlink/v1.0/common/mavlink.h>
 #include <ros/ros.h>
 #include <ros/console.h>
 #include "vehicle.h"

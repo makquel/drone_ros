@@ -1,7 +1,7 @@
 #ifndef BROADCAST_HEADER
 #define BROADCAST_HEADER
 #include "MavMessenger.h"
-#include "mavlink/common/mavlink.h"
+#include <mavlink/v1.0/common/mavlink.h>
 #include "vehicle.h"
 namespace protomav{
   class MavBroadcast : public MavMessenger{

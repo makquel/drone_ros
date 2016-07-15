@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(protomav)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 find_package(catkin REQUIRED 
   std_msgs 
   roscpp 
@@ -12,6 +14,8 @@ find_package(catkin REQUIRED
   actionlib
   geographic_msgs
   geodesy
+  mavlink
+  mavros_msgs
   )
 
 add_message_files(

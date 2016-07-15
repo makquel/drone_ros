@@ -4,7 +4,7 @@ waypoint_frame: map
 planner_frame: map
 hb_freq: 1.0
 status_freq: 1.0
-system_id: 1 
+system_id: 1
 comp_id: 240
 sensors:
 - xsens

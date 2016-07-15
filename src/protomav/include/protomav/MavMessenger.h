@@ -1,8 +1,13 @@
 #ifndef MAV_MESSENGER_HEADER
 #define MAV_MESSENGER_HEADER
 
+// #define MAVLINK_DIALECT common
+#include <mavconn/interface.h>
+// #include <mavlink/config.h>
 #include <mavros_msgs/Mavlink.h>
-#include "mavlink/common/mavlink.h"
+#include <utility>
+#include <mavros_msgs/mavlink_convert.h>
+#include <mavlink/v1.0/common/mavlink.h>// #include <mavlink.h>
 #include <ros/ros.h>
 #include <ros/console.h>
 #include "vehicle.h"
