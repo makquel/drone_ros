@@ -24,6 +24,7 @@ private:
   ros::Subscriber vel_sub;
   ros::Subscriber gps_sub;
   mavlink_global_position_int_t mgps;
+  mavlink_gps_raw_int_t rgps;
 
   const double RAD_TO_DEG =180.0/3.1415;
   const double MILLIG_TO_MS2 = 9.80665 / 1000.0;

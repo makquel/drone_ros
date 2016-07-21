@@ -18,6 +18,7 @@ Gps2Mav::Gps2Mav(){
 
 
 void Gps2Mav::send(){
+  // GLOBAL_POSITION_INT message
   mavlink_message_t mmsg; 
 
   
@@ -30,10 +31,20 @@ void Gps2Mav::send(){
   mavlink_msg_global_position_int_encode( (uint8_t) 1,  (uint8_t) 240, &mmsg,  &mgps);
  
   MavMessenger::send(mmsg);
+
+  // GPS_RAW_INT message
+  mavlink_message_t raw_mmsg;
+
+  rgps.time_usec = mgps.time_boot_ms*1000;
+  mavlink_msg_gps_raw_int_encode((uint8_t) 1,  (uint8_t) 240, &raw_mmsg, &rgps);
+  MavMessenger::send(raw_mmsg);
+
 }
 
 void Gps2Mav::gpsInfoCallback(const mtig_driver_msgs::GpsInfo::ConstPtr& info){
   //TODO
+  rgps.satellites_visible = info->satellite_number;
+  rgps.fix_type = info->gps_fix;
 }
 
 void Gps2Mav::velCallback(const geometry_msgs::TwistWithCovariance::ConstPtr& vel){
@@ -46,11 +57,24 @@ void Gps2Mav::velCallback(const geometry_msgs::TwistWithCovariance::ConstPtr& ve
 }
 
 void Gps2Mav::gpsCallback(const sensor_msgs::NavSatFix::ConstPtr &gps){
-  //mgps.fix_type=gps->status.status+3;
+  // rgps.fix_type=gps->status.status+3;
   mgps.lat= gps->latitude*1.0e7;
   mgps.lon= gps->longitude*1.0e7;
   mgps.alt = gps->altitude*1.0e3;
-  
+  rgps.lat = mgps.lat;
+  rgps.lon=mgps.lon;
+  rgps.alt=rgps.alt;
+
+  //HDOP
+  rgps.eph = __UINT16_MAX__;
+
+  //VDOP
+  rgps.epv = __UINT16_MAX__;
+
+  //COG - Course over ground (NOT heading, but direction of movement) in degrees * 100, 0.0..359.99 degrees. If unknown, set to: UINT16_MAX
+  rgps.cog = __UINT16_MAX__;
+
+
   if(!sync){send();}
 }
 
