@@ -4,7 +4,7 @@
 #include <protomav/MavMessenger.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
-#include <geometry_msgs/TwistWithCovariance.h>
+#include <geometry_msgs/TwistWithCovarianceStamped.h>
 #include <tf/tf.h>
 #include <cmath>
 
@@ -19,7 +19,7 @@ public:
 private:
   void imuCallback(const sensor_msgs::Imu::ConstPtr& imu);
   void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr &gps);
-  void velCallback(const geometry_msgs::TwistWithCovariance::ConstPtr& vel);
+  void velCallback(const geometry_msgs::TwistWithCovarianceStamped::ConstPtr& vel);
   
   ros::Subscriber imu_sub;
   ros::Subscriber vel_sub;

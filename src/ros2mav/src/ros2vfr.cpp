@@ -10,7 +10,7 @@ Ros2Vfr::Ros2Vfr(){
   nh.param("vfr_mav_freq", freq, 0.0);
   sync = (freq>0.0);
   
-  vel_sub = nh.subscribe<geometry_msgs::TwistWithCovariance>(vel_topic, 10, &Ros2Vfr::velCallback, this);
+  vel_sub = nh.subscribe<geometry_msgs::TwistWithCovarianceStamped>(vel_topic, 10, &Ros2Vfr::velCallback, this);
   imu_sub = nh.subscribe<sensor_msgs::Imu>(imu_topic, 10, &Ros2Vfr::imuCallback, this);
   gps_sub = nh.subscribe<sensor_msgs::NavSatFix>(gps_topic, 10, &Ros2Vfr::gpsCallback, this);
   
@@ -43,12 +43,12 @@ void Ros2Vfr::imuCallback(const sensor_msgs::Imu::ConstPtr& imu){
   if(!sync) send();
 }
 
-void Ros2Vfr::velCallback(const geometry_msgs::TwistWithCovariance::ConstPtr& vel){
-  vfr.groundspeed=vfr.airspeed=sqrt(vel->twist.linear.z*vel->twist.linear.z
-			       +vel->twist.linear.y*vel->twist.linear.y
-			       +vel->twist.linear.x*vel->twist.linear.x);
+void Ros2Vfr::velCallback(const geometry_msgs::TwistWithCovarianceStamped::ConstPtr& vel){
+  vfr.groundspeed=vfr.airspeed=sqrt(vel->twist.twist.linear.z*vel->twist.twist.linear.z
+			       +vel->twist.twist.linear.y*vel->twist.twist.linear.y
+			       +vel->twist.twist.linear.x*vel->twist.twist.linear.x);
   
-  vfr.climb=vel->twist.linear.z;
+  vfr.climb=vel->twist.twist.linear.z;
   if(!sync) send();
 }
 

@@ -4,7 +4,7 @@
 #include <tf/tf.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/NavSatFix.h>
-#include <geometry_msgs/TwistWithCovariance.h>
+#include <geometry_msgs/TwistWithCovarianceStamped.h>
 #include <mtig_driver_msgs/GpsInfo.h>
 #include <cmath>
 
@@ -19,7 +19,7 @@ public:
 private:
   void gpsInfoCallback(const mtig_driver_msgs::GpsInfo::ConstPtr& info);
   void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr &gps);
-  void velCallback(const geometry_msgs::TwistWithCovariance::ConstPtr& vel);
+  void velCallback(const geometry_msgs::TwistWithCovarianceStamped::ConstPtr& vel);
   ros::Subscriber gps_info_sub;
   ros::Subscriber vel_sub;
   ros::Subscriber gps_sub;
