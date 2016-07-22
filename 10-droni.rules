@@ -1,0 +1,14 @@
+#Xsens
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2639", ACTION=="add", GROUP="$GROUP", MODE="0666"
+
+#POLOLU
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1ffb", MODE="0666"
+
+#YOCTO
+SUBSYSTEM=="usb", ATTR{idVendor}=="24e0", MODE="0666"
+
+# FTDI (and Black Magic Probe) Devices
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483",  GROUP="arai", MODE="0666"
+
+# FTDI USB-Serial
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", GROUP="arai", MODE="0666"
