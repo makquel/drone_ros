@@ -1,8 +1,8 @@
-# README #
+# LEIA-ME #
 
 This README would normally document whatever steps are necessary to get your application up and running.
 
-### What is this repository for? ###
+### DRONI: Dirigível robótico de concepção inovadora ###
 
 * Quick summary
 * Version
@@ -16,6 +16,7 @@ This README would normally document whatever steps are necessary to get your app
 * Database configuration
 * How to run tests
 * Deployment instructions
+*Setup droni.rules at /etc/udev/rules.d/
 
 ### Contribution guidelines ###
 
