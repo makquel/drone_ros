@@ -1,4 +1,4 @@
-system_id: 1
+system_id: 2
 comp_id: 240
 
 mav_topic: mavlink/from
@@ -6,8 +6,12 @@ mav_topic: mavlink/from
 imu_topic: /xsens/imu
 mag_topic: /xsens/magnetic
 vel_topic: /xsens/velocity
+#vel_topic: /xsens/gps_vel
 gps_topic: /xsens/gps_data
 gps_info_topic: /xsens/gps_info
 rpy_topic: /xsens/rpy
 temp_topic: /xsens/temperature
 pressure_topic: /xsens/pressure
+altitude_topic: /altitude
+gspeed_topic: /airspeed
+#voltage_topic: /ADC0

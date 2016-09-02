@@ -33,7 +33,7 @@ void Temp2Mav::tempCallback(const sensor_msgs::Temperature::ConstPtr& temp){
 
 void Temp2Mav::pressureCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure){
  
-  mav_pressure.press_abs = pressure->fluid_pressure;
+  mav_pressure.press_abs = pressure->fluid_pressure; 
   if(!sync) {send();}
 }
 

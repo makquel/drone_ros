@@ -6,7 +6,7 @@ MavMessenger::MavMessenger(){
   std::string mav_topic;
   ros::NodeHandle nh;
   nh.param<std::string>("mav_topic", mav_topic, "mavlink/from");
-  nh.param<int>("system_id", system_id, 1);
+  nh.param<int>("system_id", system_id, 1);//Should I change it, QGS keeps the warining on!
   nh.param<int>("comp_id", comp_id, 240);
   mav_pub = nh.advertise<mavros_msgs::Mavlink>(mav_topic, 10);
 }

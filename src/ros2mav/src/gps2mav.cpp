@@ -63,8 +63,8 @@ void Gps2Mav::gpsCallback(const sensor_msgs::NavSatFix::ConstPtr &gps){
   mgps.alt = gps->altitude*1.0e3;
 
   rgps.lat = mgps.lat;
-  rgps.lon=mgps.lon;
-  rgps.alt=rgps.alt;
+  rgps.lon = mgps.lon;
+  rgps.alt = rgps.alt;
 
   //HDOP
   rgps.eph = __UINT16_MAX__;

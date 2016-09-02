@@ -2,18 +2,24 @@
 
 Ros2Vfr::Ros2Vfr(){
   ROS_INFO("CONSTRUCTOR");
-  std::string imu_topic, vel_topic,gps_topic;
+  std::string imu_topic, vel_topic,gps_topic,pressure_topic,altitude_topic,gspeed_topic;
   ros::NodeHandle nh;
   nh.getParam("imu_topic", imu_topic);
   nh.getParam("vel_topic", vel_topic);
-  nh.getParam("gps_topic", gps_topic);
-  nh.param("vfr_mav_freq", freq, 0.0);
+  //nh.getParam("gps_topic", gps_topic);
+  nh.getParam("pressure_topic", pressure_topic);
+  nh.getParam("altitude_topic", altitude_topic);
+  nh.getParam("gspeed_topic", gspeed_topic);
+
+  nh.param("vfr_mav_freq", freq, 100.0);//????
   sync = (freq>0.0);
   
   vel_sub = nh.subscribe<geometry_msgs::TwistWithCovarianceStamped>(vel_topic, 10, &Ros2Vfr::velCallback, this);
   imu_sub = nh.subscribe<sensor_msgs::Imu>(imu_topic, 10, &Ros2Vfr::imuCallback, this);
-  gps_sub = nh.subscribe<sensor_msgs::NavSatFix>(gps_topic, 10, &Ros2Vfr::gpsCallback, this);
-  
+  //gps_sub = nh.subscribe<sensor_msgs::NavSatFix>(gps_topic, 10, &Ros2Vfr::gpsCallback, this);
+  gps_sub = nh.subscribe<sensor_msgs::FluidPressure>(pressure_topic, 10, &Ros2Vfr::gpsCallback, this);
+  alt_sub = nh.subscribe<sf11_altimeter::sensor_data>(altitude_topic, 10, &Ros2Vfr::altCallback, this);
+  gspeed_sub = nh.subscribe<droni_airspeed_driver::sensor_data>(gspeed_topic, 10, &Ros2Vfr::gspeedCallback, this);   
 }
 
 
@@ -52,8 +58,23 @@ void Ros2Vfr::velCallback(const geometry_msgs::TwistWithCovarianceStamped::Const
   if(!sync) send();
 }
 
-void Ros2Vfr::gpsCallback(const sensor_msgs::NavSatFix::ConstPtr &gps){
-  vfr.alt = gps->altitude; 
+void Ros2Vfr::gpsCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure){
+  float cte = 145366.45;
+  float expo = 0.190284;
+  //vfr.alt = pow((1-(pressure->fluid_pressure/1013.25)),expo)*cte;
+
+  if(!sync) send();
+}
+
+void Ros2Vfr::altCallback(const sf11_altimeter::sensor_data::ConstPtr& alt){
+  vfr.alt = alt->altitude; //m
+  //vfr.alt = 10;
+  if(!sync) send();
+}
+
+void Ros2Vfr::gspeedCallback(const droni_airspeed_driver::sensor_data::ConstPtr& gspeed){
+  //vfr.airspeed = gspeed->airspeed;
+  vfr.airspeed = 10; //m/s
   if(!sync) send();
 }
 
@@ -64,9 +85,7 @@ int main(int argc,  char** argv) {
  
  
  
- 
  ROS_DEBUG("ENTERING LOOP");
  ros::spin();
  ROS_INFO("OUT OF THE LOOP"); 
 }
-

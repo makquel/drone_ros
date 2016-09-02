@@ -106,6 +106,7 @@ include_directories(include ${catkin_INCLUDE_DIRS}
  add_executable(gps2mav_node src/gps2mav.cpp)
  add_executable(ros2att_node src/ros2att.cpp)
  add_executable(temp2mav_node src/temp2mav.cpp)
+ add_executable(soc2mav_node src/soc2mav.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ros2mav_node ros2mav_generate_messages_cpp)
@@ -136,6 +137,11 @@ target_link_libraries(temp2mav_node
    protomav
 )
 
+target_link_libraries(soc2mav_node
+   protomav
+   ${catkin_LIBRARIES}
+ )
+
 #############
 ## Install ##
 #############
@@ -151,7 +157,7 @@ target_link_libraries(temp2mav_node
 # )
 
 # Mark executables and/or libraries for installation
-install(TARGETS imu2mav_node ros2vfr_node gps2mav_node ros2att_node temp2mav_node
+install(TARGETS imu2mav_node ros2vfr_node gps2mav_node ros2att_node temp2mav_node soc2mav_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

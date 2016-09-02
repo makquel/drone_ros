@@ -1,5 +1,5 @@
 <launch>
-  <rosparam command="load" file="$(find ros2mav)/config/vero.yaml" />
+  <rosparam command="load" file="$(find ros2mav)/config/droni.yaml" />
   <node pkg="ros2mav" type="ros2vfr_node" name="ros2vfr_node" output="screen"/>
   <node pkg="ros2mav" type="ros2att_node" name="ros2att_node" output="screen"/>
   <node pkg="ros2mav" type="imu2mav_node" name="imu2mav_node" output="screen"/>

@@ -10,4 +10,4 @@ gps_topic: /verocarfreedom/xsens/gps/data
 gps_info_topic: /verocarfreedom/xsens/gps_info
 rpy_topic: /verocarfreedom/xsens/rpy
 temp_topic: /verocarfreedom/xsens/temperature/data
-pressure_topic: /verocarfreedom/xsens/pressure/data
+pressure_topic: /verocarfreedom/xsens/pressure

@@ -3,6 +3,7 @@
   <include file="$(find protomav)/launch/protomav.launch" />
   <include file="$(find ros2mav)/launch/image2mav.launch" />
   <!--include file="$(find mtig_driver)/launch/mtig_driver.launch" /-->
+  <include file="$(find sf11_altimeter)/launch/sf11c_node.launch" />
   <!--include file="$(find protomav)/launch/mavros.launch" /--> 
 <!--   <node pkg="mavros" type="gcs_bridge" name="mavlink_bridge">
 		<param name="gcs_url" value="udp://localhost:14554@localhost:14553" />
