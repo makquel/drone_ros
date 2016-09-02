@@ -1,0 +1,16 @@
+<launch>
+    <node pkg="stack_tester" type="looper" name="looper" output="screen">
+
+    </node>
+
+
+    <node pkg="mtig_driver" type="mtig_driver_node" name="mtig_driver_node" output="screen">
+
+    </node>
+
+    <node pkg="droni_airspeed_driver" type="airspeed_node" name="airspeed_node" output="screen">
+
+    </node>
+
+</launch>
+
