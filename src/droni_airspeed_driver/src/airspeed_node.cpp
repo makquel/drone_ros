@@ -9,9 +9,12 @@
 #include <vector>
 #include <iomanip>
 
-serial::Serial ser;
+#include <droni_airspeed_driver/sensor_data.h>
 
+serial::Serial ser;
 bool CTS_status;
+std::string serial_port;
+int serial_speed;
 
 void write_callback(const std_msgs::String::ConstPtr& msg){
     ROS_INFO_STREAM("Writing to serial port" << msg->data.c_str());
@@ -19,11 +22,16 @@ void write_callback(const std_msgs::String::ConstPtr& msg){
 }
 
 int main (int argc, char** argv){
-    ros::init(argc, argv, "serial_example_node");
+    ros::init(argc, argv, "cti_airspeed_node");
     ros::NodeHandle nh;
 
     //ros::Subscriber write_sub = nh.subscribe("write", 1000, write_callback);
-    ros::Publisher airspeed = nh.advertise<std_msgs::Float32>("airspeed_msg", 1000);
+    ros::Publisher airspeed = nh.advertise<std_msgs::Float32>("airspeed_msg", 5);
+
+    //setting default device path for the sensor
+    nh.param("serial_port", serial_port, std::string("/dev/ttyUSB0"));
+    //setting default device communication speed for the sensor
+    nh.param("serial_speed", serial_speed, int(9600));
 
     unsigned char xml_parser_on[] = { 0x7E, 0x00, 0x10, 0x17, 0x01, 0x00, 0x7D, 0x33, 0xA2, 0x00, 0x40, 0x30, 0xEF, 0xE8, 0xFF, 0xFE, 0x02, 0x44, 0x31, 0x05, 0x72 };
     std::vector<unsigned char> airspeed_on(xml_parser_on, xml_parser_on+21);
@@ -33,8 +41,8 @@ int main (int argc, char** argv){
 
     try
     {
-        ser.setPort("/dev/ttyUSB0");
-        ser.setBaudrate(9600);
+        ser.setPort(serial_port);
+        ser.setBaudrate(serial_speed);
         serial::Timeout to = serial::Timeout::simpleTimeout(1000);
         ser.setTimeout(to);
         ser.open();
@@ -58,7 +66,7 @@ int main (int argc, char** argv){
     ros::Rate loop_rate(1); //1Hz
     ros::Duration duration(1./4.); //0.25s
 
-    
+
     std::vector<unsigned char> hexstring;
     hexstring.push_back(0x7E);
     hexstring.push_back(0x00);
@@ -92,21 +100,23 @@ int main (int argc, char** argv){
         duration.sleep();
 
         //std::cout << "CTS:" << ser.getCTS() << "\n";
-        //std::cout << "Buffer size: " << ser.available() << "\n";    
+        //std::cout << "Buffer size: " << ser.available() << "\n";
         if(ser.available()){
             //ROS_INFO_STREAM("Reading from serial port");
             std_msgs::Float32 result;
-           
+            droni_airspeed_driver::sensor_data msg;
             ser.read(response, ser.available());
-            //std::cout << "Vector size: " << response.size() << "\n"; 
+            //std::cout << "Vector size: " << response.size() << "\n";
             //for(int i=0; i<response.size(); ++i)
             //    std::cout << response[i] << ' ';
             float x = ((response[25])*256 + (response[26])*1)*3.3;
             //std::cout << "AirSpeed_ping: [" << x << "]\n";
             result.data = x;
             //result.data = response[25];
+            msg.airspeed = x;
+            msg.header.stamp = ros::Time::now();
             ROS_INFO_STREAM("Airspeed[mV]: " << result.data);
-            airspeed.publish(result);
+            airspeed.publish(msg);
         }
         response.clear(); //delete objects within vector
         std::vector<unsigned char>().swap(response); // Frees memory
