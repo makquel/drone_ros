@@ -22,9 +22,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.9050967"
-     inkscape:cx="693.93433"
-     inkscape:cy="309.18827"
+     inkscape:zoom="1.8101934"
+     inkscape:cx="671.98449"
+     inkscape:cy="310.62351"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -849,30 +849,26 @@
            x="203.27643"
            sodipodi:role="line">NUC</tspan></text>
     </g>
-    <g
-       id="g5655"
-       transform="translate(42.260678,-145.33434)">
-      <rect
-         transform="scale(1,-1)"
-         style="opacity:0.93999999;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.60000002;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-         id="rect3082-1-2-8-3-8-1-6-0-4-9-6-1"
-         width="67.796326"
-         height="43.55521"
-         x="283.48315"
-         y="-835.92328" />
-      <text
-         sodipodi:linespacing="125%"
-         id="text3135-5-9-4-2-4-6-6-7-8-2-32-5"
-         y="819.19965"
-         x="317.48969"
-         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         xml:space="preserve"><tspan
-           id="tspan4135-0-5"
-           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
-           y="819.19965"
-           x="317.48969"
-           sodipodi:role="line">Garateia</tspan></text>
-    </g>
+    <rect
+       y="-694.84198"
+       x="310.92493"
+       height="52.613708"
+       width="81.896423"
+       id="rect3082-1-2-8-3-8-1-6-0-4-9-6-1"
+       style="opacity:0.93999999;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.93276381;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       transform="scale(1,-1)" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="352.01639"
+       y="659.84491"
+       id="text3135-5-9-4-2-4-6-6-7-8-2-32-5"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         x="352.01639"
+         y="659.84491"
+         style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Ubuntu;-inkscape-font-specification:Ubuntu"
+         id="tspan4135-0-5">Garateia</tspan></text>
     <path
        inkscape:connector-curvature="0"
        id="path2286-1-9-1-1-8-7"
@@ -2675,5 +2671,40 @@
        sodipodi:ry="14.363107"
        d="m 314.8835,-23.828339 c 0,7.932525 -5.44126,14.3631071 -12.1534,14.3631071 -6.71213,0 -12.1534,-6.4305821 -12.1534,-14.3631071 0,-7.932524 5.44127,-14.363106 12.1534,-14.363106 6.71214,0 12.1534,6.430582 12.1534,14.363106 z"
        transform="matrix(0.19151323,0,0,0.16204965,778.15626,943.86486)" />
+    <g
+       transform="matrix(0.14351689,0,0,0.14351689,328.34347,670.95306)"
+       id="layer1-3">
+      <g
+         transform="translate(-9.449579,-154.724)"
+         id="g3070">
+        <path
+           inkscape:connector-curvature="0"
+           d="m 242.85714,269.50504 a 34.285715,34.285715 0 1 1 -68.57143,0 34.285715,34.285715 0 1 1 68.57143,0 z"
+           transform="matrix(0.558077,0,0,0.558077,14.06064,70.25447)"
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:8.6200676;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="path1307" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 238.21281,220.65917 93.1246,0"
+           style="color:#000000;fill:none;stroke:#000000;stroke-width:4.81063986;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible"
+           id="path2184" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 15.948597,220.65917 93.124613,0"
+           style="color:#000000;fill:none;stroke:#000000;stroke-width:4.81063986;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible"
+           id="path3059" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 130.36418,162.78665 93.51114,61.20986"
+           style="color:#000000;fill:none;stroke:#000000;stroke-width:4.8106389;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible"
+           id="path3061" />
+        <path
+           inkscape:connector-curvature="0"
+           d="m 242.85714,269.50504 a 34.285715,34.285715 0 1 1 -68.57143,0 34.285715,34.285715 0 1 1 68.57143,0 z"
+           transform="matrix(0.558077,0,0,0.558077,102.3219,70.25447)"
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:8.6200676;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="path2182" />
+      </g>
+    </g>
   </g>
 </svg>
