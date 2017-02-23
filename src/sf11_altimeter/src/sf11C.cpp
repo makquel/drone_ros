@@ -34,7 +34,7 @@ int main (int argc, char** argv){
     //std::vector<unsigned char> airspeed_on(xml_parser_on, xml_parser_on+21);
 
     //setting default device path for the sensor
-    nh.param("serial_port", serial_port, std::string("/dev/ttyUSB0"));
+    nh.param("serial_port", serial_port, std::string("/dev/sensors/sf11"));
     //setting default device communication speed for the sensor
     nh.param("serial_speed", serial_speed, int(115200));
     try

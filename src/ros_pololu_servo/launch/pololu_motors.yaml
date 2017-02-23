@@ -4,7 +4,7 @@
 prop_one:
   pololu_id: 12
   motor_id: 0
-  init: 1500
+  init: 1005
   min: 1000
   max: 2000
   reverse: true
@@ -17,7 +17,7 @@ prop_one:
 prop_two:
   pololu_id: 12
   motor_id: 1
-  init: 1500
+  init: 1005
   min: 1000
   max: 2000
   reverse: true
@@ -30,7 +30,7 @@ prop_two:
 prop_three:
   pololu_id: 12
   motor_id: 2
-  init: 1500
+  init: 1005
   min: 1000
   max: 2000
   reverse: true
@@ -43,7 +43,7 @@ prop_three:
 prop_four:
   pololu_id: 12
   motor_id: 3
-  init: 1500
+  init: 1005
   min: 1000
   max: 2000
   reverse: true
@@ -165,7 +165,7 @@ leme_four:
 DO_garteia:
   pololu_id: 12
   motor_id: 19
-  init: 1499
+  init: 1005
   min: 1000
   max: 2000
   reverse: false
@@ -179,7 +179,7 @@ DO_garteia:
 DO_helio:
   pololu_id: 12
   motor_id: 18
-  init: 1499
+  init: 1005
   min: 1000
   max: 2000
   reverse: false
@@ -188,4 +188,3 @@ DO_helio:
     min_angle: -500
     max_pulse: 2000
     max_angle: 500
-

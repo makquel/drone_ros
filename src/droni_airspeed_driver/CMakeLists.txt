@@ -188,6 +188,7 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
 add_executable(airspeed_node src/airspeed_node.cpp)
-target_link_libraries(airspeed_node ${catkin_LIBRARIES})
-add_dependencies(airspeed_node beginner_tutorials_generate_messages_cpp)
+add_dependencies(airspeed_node droni_airspeed_driver_generate_messages_cpp serial ${catkin_EXPORTED_TARGETS})
+target_link_libraries(airspeed_node serial ${catkin_LIBRARIES})

@@ -69,7 +69,7 @@ int main(int argc, char **argv)
     int taxa=1;           //variável para a taxa de variação da posição no modo automático
     char c;
 
-    ros_pololu_servo::MotorCommand mtr;     //objeto da mensagem que será publicada
+    ros_pololu_servo::MotorCommand mtr;    //objeto da mensagem que será publicada
     while (ros::ok())
     {
         if(mode==1)
@@ -103,12 +103,12 @@ int main(int argc, char **argv)
             {
                 ROS_INFO("Enter initial position, please");
             }
-            while (((scanf("%d%c", &position, &c)!=2 || c!='\n') && clean_stdin())); 
+            while (((scanf("%d%c", &position, &c)!=2 || c!='\n') && clean_stdin()));
             do
             {
                 ROS_INFO("Enter velocity, please");
             }
-            while (((scanf("%d%c", &taxa, &c)!=2 || c!='\n') && clean_stdin())); 
+            while (((scanf("%d%c", &taxa, &c)!=2 || c!='\n') && clean_stdin()));
             if(taxa<0){
                 taxa=-taxa;
                 flag_posit=!flag_posit;
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
             }
 //ROS_INFO("\rmotor escolhido: %d",mot_pos);
         }
-   
+
         if (mot_pos == 0)
             mtr.joint_name = "prop_one";
         else if (mot_pos == 1)
@@ -229,4 +229,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-

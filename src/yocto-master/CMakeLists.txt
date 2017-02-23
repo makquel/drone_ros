@@ -57,6 +57,7 @@ include_directories(SYSTEM ${LIBUSB_1_INCLUDE_DIRS})
    msg
    FILES
    PWM_info.msg
+	 voltage_info.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -92,7 +93,7 @@ include_directories(SYSTEM ${LIBUSB_1_INCLUDE_DIRS})
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES yocto
-  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime actionlib_msgs
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -140,6 +141,7 @@ add_library(yoctoapi
  add_library(yocto
    src/yocto/yocto_api.cpp
    src/yocto/yocto_pwminput.cpp
+	 src/yocto/yocto_voltage.cpp
 )
 
 ## Declare a cpp executable
@@ -168,16 +170,9 @@ target_link_libraries(yoctoapi
  )
 
 
-
-add_executable(yocto_PWM src/yocto_PWM_node.cpp)
-
-target_link_libraries(yocto_PWM
-   ${catkin_LIBRARIES}
-   ${LIBUSB_1_LIBRARIES}
-	yocto
-)
-
-add_dependencies(yocto_PWM ${catkin_EXPORTED_TARGETS})
+add_executable(yocto_node src/yocto_PWM_node.cpp)
+add_dependencies(yocto_node yocto_generate_messages_cpp yocto yoctoapi ${catkin_EXPORTED_TARGETS})
+target_link_libraries(yocto_node yocto yoctoapi ${catkin_LIBRARIES} ${LIBUSB_1_LIBRARIES})
 
 
 #############

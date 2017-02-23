@@ -9,9 +9,8 @@
 #include <stdlib.h>
 # define M_PI           3.14159265358979323846
 # define manual_mode 1
-# define autom_mode 2
+# define autom5_mode 2
 # define autom1_mode 0
-#define numMotors 8
 /**
  * Código para a publicação de mensagens do tipo ros_pololu_servo::MotorCommand no tópico /pololu/comand
  * Simula o que o nó controlador do DRONI irá fazer apenas para testar as rotinas de comutação
@@ -67,18 +66,18 @@ int main(int argc, char **argv)
 
     int mot_pos = 0;                        //variável para determinar para qual motor a mensagem será enviada
     float position=0;                       //variável que determina posição do motor que será enviada na mensagem
-    float position_motors[numMotors];
-    float velocidades[numMotors];
+    float position_motors[5]= {0,0,0,0,0};
+    float velocidades[5] ={1, 2, 3, -2,-1};
     int mode= manual_mode;                  //modo de operação do nó talker2:: 0= variable 1 = manual.
-    bool flag_inic=0;                        //flag para determinar se o nó está no primeiro loop ou não
-    bool flag_posit=0;                       //flag para determinar se a opsição aumentará ou diminuirá no modo automático. 0 -> posit increasing, 1-> posit decreasing
-    bool flag_position[numMotors];
+    int flag_inic=0;                        //flag para determinar se o nó está no primeiro loop ou não
+    int flag_posit=0;                       //flag para determinar se a opsição aumentará ou diminuirá no modo automático. 0 -> posit increasing, 1-> posit decreasing
+    int flag_position[5]= {0,0,0,0,0};
     float taxa=1;                            //variável para a taxa de variação da posição no modo automático
     int i;
     int kill_node=0;
     char c;
 
-    ros_pololu_servo::MotorCommand mtr;     //objeto da mensagem que será publicada
+    ros_pololu_servo::MotorCommand mtr;   //objeto da mensagem que será publicada
 
     while (ros::ok()&&!kill_node)
     {
@@ -86,18 +85,18 @@ int main(int argc, char **argv)
         {
             do
             {
-                ROS_INFO("\n\nSelect Mode:\n\n(0)- Automatically variable (with one motor).\n(1)- Manual.\n(2)- Automatically variable with %d motors.\n(3)- Kill this node.\n", numMotors);
+                ROS_INFO("\n\nSelect Mode:\n\n(0)- Automatically variable (with one motor).\n(1)- Manual.\n(2)- Automatically variable with five motors.\n(3)- Kill this node.\n");
             }  // Seleciona o modo de operação do nó
             while (((scanf("%d%c", &mode, &c)!=2 || c!='\n') && clean_stdin()));
         }
 
-        if(mode==3) 
+        if(mode==3)
         {
             kill_node=1;
             break;
         }
 
-        if(mode!=autom1_mode && mode != manual_mode && mode != autom_mode )
+        if(mode!=autom1_mode && mode != manual_mode && mode != autom5_mode )
         {
             ROS_INFO("Mode selected is invalid, setting to manual mode");
             mode = manual_mode;
@@ -119,46 +118,39 @@ int main(int argc, char **argv)
 
         }
 
-        if(!flag_inic&&mode==autom1_mode)
+        if(flag_inic==0&&mode==autom1_mode)
         {
-            flag_inic=true;
+            flag_inic=1;
 
             do
             {
                 ROS_INFO("Which motor?");
             }
             while (((scanf("%d%c", &mot_pos, &c)!=2 || c!='\n') && clean_stdin()));
-            
+
             do
             {
                 ROS_INFO("Enter velocity, please");
             }
-            while (((scanf("%f%c", &taxa, &c)!=2 || c!='\n') && clean_stdin())); 
+            while (((scanf("%f%c", &taxa, &c)!=2 || c!='\n') && clean_stdin()));
             if(taxa<0){
                 taxa=-taxa;
                 flag_posit=!flag_posit;
             }
-
         }
 
 
-        if(!flag_inic&&mode== autom_mode){
+        if(flag_inic==0&&mode== autom5_mode){
 
-            flag_inic=true;
+            flag_inic=1;
             do
             {
                 ROS_INFO("Enter velocity, please");
             }
-            while (((scanf("%f%c", &taxa, &c)!=2 || c!='\n') && clean_stdin())); 
+            while (((scanf("%f%c", &taxa, &c)!=2 || c!='\n') && clean_stdin()));
             if(taxa<0){
                 taxa=-taxa;
                 flag_posit=!flag_posit;
-            }
-
-            for(i=0;i<numMotors;i++){
-                flag_position[i]=false;
-                velocidades[i]= 1+ i- numMotors/2;
-                position_motors[i]= 0;
             }
         }
 
@@ -175,7 +167,7 @@ int main(int argc, char **argv)
             }
             else if(position<=-45)
             {
-                flag_posit=false;
+                flag_posit=0;
                 position =-45;
             }
         }
@@ -231,15 +223,15 @@ int main(int argc, char **argv)
         }
 
 
-        if(mode== autom_mode)
+        if(mode== autom5_mode)
         {
             /**aqui serão utilizados os motores 0 (propulsão) 6 e 8 (vetorização) 12 e 14 (lemes)*/
 
             mtr.speed = 1.0;
             mtr.acceleration=1.0;
 
-            for(i=0;i<numMotors;i++){
-	
+            for(i=0;i<5;i++){
+
                 if(taxa*velocidades[i]>=0)
 		        {
 			         if(!flag_position[i])
@@ -253,15 +245,15 @@ int main(int argc, char **argv)
 	                else
 	                    position_motors[i]+=velocidades[i]*taxa;
                 }
-                
+
                 if(position_motors[i]>=45)
                 {
-                    flag_position[i]=true;
+                    flag_position[i]=1;
                     position_motors[i] =45;
                 }
                 else if(position_motors[i]<=-45)
                 {
-                    flag_position[i]=false;
+                    flag_position[i]=0;
                     position_motors[i] =-45;
                 }
 
@@ -271,25 +263,16 @@ int main(int argc, char **argv)
                         mtr.joint_name = "prop_one";
                     break;
                     case 1:
-                        mtr.joint_name = "prop_two";
-                    break; 
-                    case 2:
                         mtr.joint_name = "vet_one";
                     break;
-                    case 3:
-                        mtr.joint_name = "vet_two";
+                    case 2:
+                        mtr.joint_name = "vet_three";
                     break;
-                    case 4:
+                    case 3:
                         mtr.joint_name = "leme_one";
                     break;
-                    case 5:
-                        mtr.joint_name = "leme_two";
-                    break;
-                    case 6:
+                    case 4:
                         mtr.joint_name = "leme_three";
-                    break;
-                    case 7:
-                        mtr.joint_name = "leme_four";
                     break;
                 }
 
@@ -311,4 +294,3 @@ int main(int argc, char **argv)
 
     return 0;
 }
-

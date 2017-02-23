@@ -168,12 +168,6 @@ int main(int argc, char **argv)
                     case 11:
                         mtr.joint_name = "leme_four";
                     break;
-                    case 12:
-                        mtr.joint_name = "DO_garteia";
-                    break;                    
-                    case 13:
-                        mtr.joint_name = "DO_helio";
-                    break;
                 }
 
                 position=(int)position_motors[i];

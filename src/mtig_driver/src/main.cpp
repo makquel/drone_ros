@@ -1,4 +1,4 @@
-/* 
+/*
  * @copyright
  * Copyright (c) Xsens Technologies B.V., 2006-2012. All rights reserved.
 
@@ -23,18 +23,6 @@ and is intended for use only by Xsens Technologies BV and
  * @author Lucas Casanova Nogueira, based on code from Ji Zhang and Silvio Maeta
  *          in the <a href="http://wiki.ros.org/receive_xsens">receive_xsens</a> package
  */
-#include "serialkey.h"
-
-#include <iostream>
-#include <list>
-#include <iomanip>
-#include <stdexcept>
-
-
-#include <xsens/xstime.h>
-
-#include "conio.h" // for non ANSI _kbhit() and _getch()
-
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <sensor_msgs/Imu.h>
@@ -42,85 +30,14 @@ and is intended for use only by Xsens Technologies BV and
 #include <sensor_msgs/Temperature.h>
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/FluidPressure.h>
+#include <sensor_msgs/Image.h>
 #include <geometry_msgs/Twist.h>
 
-#include "mtiG.h"
+//#include "mtiG.h"
+
+#include "CallbackHandler.h"
 
 
-/**
- * @brief Callback handler for incoming data packets from the device
- * @param maxBufferSize
- */
-class CallbackHandler : public XsCallback
-{
-public:
-	CallbackHandler(size_t maxBufferSize = 5) : m_maxNumberOfPacketsInBuffer(maxBufferSize), m_numberOfPacketsInBuffer(0)
-#ifdef _MSC_VER
-	{InitializeCriticalSection(&m_CriticalSection);}
-	virtual ~CallbackHandler() throw() {DeleteCriticalSection(&m_CriticalSection);}
-#else
-	{
-	  //create mutex attribute variable
-	  pthread_mutexattr_t mAttr;
-
-	  // setup recursive mutex for mutex attribute
-	  pthread_mutexattr_settype(&mAttr, PTHREAD_MUTEX_RECURSIVE_NP);
-
-	  // Use the mutex attribute to create the mutex
-	  pthread_mutex_init(&m_CriticalSection, &mAttr);
-
-	  // Mutex attribute can be destroy after initializing the mutex variable
-	  pthread_mutexattr_destroy(&mAttr);
-
-	}
-	virtual ~CallbackHandler() throw() {pthread_mutex_destroy(&m_CriticalSection);}
-#endif
-
-	bool packetAvailable() const {Locker lock(*this); return m_numberOfPacketsInBuffer > 0;}
-	XsDataPacket getNextPacket()
-	{
-		assert(packetAvailable());
-		Locker lock(*this);
-		XsDataPacket oldestPacket(m_packetBuffer.front());
-		m_packetBuffer.pop_front();
-		--m_numberOfPacketsInBuffer;
-		return oldestPacket;
-	}
-
-protected:
-	virtual void onDataAvailable(XsDevice*, const XsDataPacket* packet)
-	{
-		Locker lock(*this);
-		assert(packet != 0);
-		while (m_numberOfPacketsInBuffer >= m_maxNumberOfPacketsInBuffer)
-		{
-			(void)getNextPacket();
-		}
-		m_packetBuffer.push_back(*packet);
-		++m_numberOfPacketsInBuffer;
-		assert(m_numberOfPacketsInBuffer <= m_maxNumberOfPacketsInBuffer);
-	}
-private:
-#ifdef _MSC_VER
-	mutable CRITICAL_SECTION m_CriticalSection;
-#else
-	mutable pthread_mutex_t m_CriticalSection;
-#endif
-	struct Locker
-	{
-#ifdef _MSC_VER
-		Locker(CallbackHandler const & self) : m_self(self) {EnterCriticalSection(&m_self.m_CriticalSection);}
-		~Locker() throw() {LeaveCriticalSection(&m_self.m_CriticalSection);}
-#else
-		Locker(CallbackHandler const & self) : m_self(self) {pthread_mutex_lock(&m_self.m_CriticalSection);}
-		~Locker() throw() {pthread_mutex_unlock(&m_self.m_CriticalSection);}
-#endif
-		CallbackHandler const & m_self;
-	};
-	size_t m_maxNumberOfPacketsInBuffer;
-	size_t m_numberOfPacketsInBuffer;
-	std::list<XsDataPacket> m_packetBuffer;
-};
 
 
 
@@ -130,10 +47,10 @@ private:
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "receive_xsens");
-		
+
 	//DEBUG
 	if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
-	   ros::console::notifyLoggerLevelsChanged();	
+	   ros::console::notifyLoggerLevelsChanged();
 	}
 
 	if (!setSerialKey())
@@ -172,12 +89,12 @@ int main(int argc, char** argv)
 			// Get the device object
 			XsDevice* device = control->device(mtPort->deviceId());
 			assert(device != 0);
-		
+
 			// Print information about detected MTi / MTx / MTmk4 device
 			std::cout << "Device: " << device->productCode().toStdString() << " opened." << std::endl;
 			ROS_INFO("Output Mode: %.4x",  device->outputMode() );
 
-			// Creates an mtiG object using the device object and command-line parameters			
+			// Creates an mtiG object using the device object and command-line parameters
 			mtiG myXsens(device, argc, argv);
 
 			// Create and attach callback handler to device
@@ -196,9 +113,9 @@ int main(int argc, char** argv)
 			{
 				if (callback.packetAvailable())
 				{
-					
+
 					ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "PACKET INFORMATION: "); 
-					
+
 					// Retrieve a packet
 					XsDataPacket packet = callback.getNextPacket();
 
@@ -206,7 +123,7 @@ int main(int argc, char** argv)
 					myXsens.fillData(&packet);
 
 					// Publish ROS message
-					myXsens.publish();					
+					myXsens.publish();
 
 					std::cout << std::flush;
 				}

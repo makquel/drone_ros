@@ -18,7 +18,7 @@ MessageMaker::MessageMaker(SensorData & _data):data(_data){
 }
 
 /**
- * @brief Creates a sensor_msgs/Imu ROS message from sensor data    	
+ * @brief Creates a sensor_msgs/Imu ROS message from sensor data
  * @details Uses data collected from the device's inertial measurement unit(IMU)
  * angular velocity from gyroscope
  * linear acceleration from accelerometer
@@ -29,7 +29,7 @@ sensor_msgs::Imu MessageMaker::fillImuMessage(){
 	sensor_msgs::Imu imuData;
 	imuData.header.frame_id = data.frameId();
 	imuData.header.stamp = ros::Time::now();
-	
+
 	imuData.angular_velocity.x = data.gyroscope_x();
 	imuData.angular_velocity.y = data.gyroscope_y();
 	imuData.angular_velocity.z = data.gyroscope_z();
@@ -37,7 +37,7 @@ sensor_msgs::Imu MessageMaker::fillImuMessage(){
 	for(int i=0 ; i < 9 ; i++){
 		imuData.angular_velocity_covariance[i]=0.0;
 	}
-	imuData.angular_velocity_covariance[0] = 
+	imuData.angular_velocity_covariance[0] =
 		imuData.angular_velocity_covariance[4] =
 		imuData.angular_velocity_covariance[8] = data.gyrError();
 
@@ -48,8 +48,8 @@ sensor_msgs::Imu MessageMaker::fillImuMessage(){
 	for(int i=0 ; i < 9 ; i++){
 		imuData.linear_acceleration_covariance[i]=0.0;
 	}
-	imuData.linear_acceleration_covariance[0] = 
-		imuData.linear_acceleration_covariance[4] = 
+	imuData.linear_acceleration_covariance[0] =
+		imuData.linear_acceleration_covariance[4] =
 		imuData.linear_acceleration_covariance[8] = data.accError();
 
 
@@ -64,20 +64,20 @@ sensor_msgs::Imu MessageMaker::fillImuMessage(){
 	imuData.orientation_covariance[0] = data.rollError();
 	imuData.orientation_covariance[4] = data.pitchError();
 	imuData.orientation_covariance[8] = data.yawError();
- 	
+
 	return imuData;
 }
 
 /**
  * @brief Creates a sensor_msgs/NavSatFix ROS message from sensor data
- * @details Uses data collected from the device's GPS. 
+ * @details Uses data collected from the device's GPS.
  *           The covariance is given using DOP and Position Acuraccy.
  *           We assumed Position Accuracy is the std dev.
  */
 sensor_msgs::NavSatFix MessageMaker::fillNavSatFixMessage(){
 	sensor_msgs::NavSatFix gpsData;
 	sensor_msgs::NavSatStatus status_msg;
-	
+
 	gpsData.header.frame_id = data.frameId() + "_gps" ;
 	gpsData.header.stamp = ros::Time::now();
 
@@ -87,10 +87,10 @@ sensor_msgs::NavSatFix MessageMaker::fillNavSatFixMessage(){
 	//gpsData.latitude = 22.852071*-1;
 	//gpsData.longitude = 47.127206*-1;
 
-	ROS_INFO("Filling GPS data"); 
+	//ROS_INFO("Filling GPS data");
 
 	gpsData.position_covariance_type = sensor_msgs::NavSatFix::COVARIANCE_TYPE_DIAGONAL_KNOWN;
-	
+
 	for(int i=0 ; i < 9 ; i++){
 		gpsData.position_covariance[i]=0.0;
 	}
@@ -101,7 +101,7 @@ sensor_msgs::NavSatFix MessageMaker::fillNavSatFixMessage(){
 	gpsData.position_covariance[8]= (data.vdop() * data.PositionAccuracy()/100) * (data.vdop() * data.PositionAccuracy()/100);
 
 	//Status comes from status word of the sensor, no augmentation at this step
-	if(data.GpsFixStatus() >= 3){ 
+	if(data.GpsFixStatus() >= 3){
 		status_msg.status = sensor_msgs::NavSatStatus::STATUS_FIX;
 	}
 	else{
@@ -120,35 +120,34 @@ sensor_msgs::NavSatFix MessageMaker::fillNavSatFixMessage(){
  * The data is collected from the device's gyroscopes and GPS
  */
 geometry_msgs::TwistWithCovarianceStamped MessageMaker::fillVelocityMessage(){
-	geometry_msgs::TwistWithCovarianceStamped stamped;
-	geometry_msgs::TwistWithCovariance res;
-	geometry_msgs::Twist velocityData;
+	geometry_msgs::TwistWithCovarianceStamped velocityData;
+
 	for(int i=0;i<36;i++){
-		res.covariance[i]=0.0;
-	} 
-	res.covariance[0]=res.covariance[7]=res.covariance[14]=0.001;
-	res.covariance[21]=res.covariance[28]=res.covariance[35]=0.01;
+		velocityData.twist.covariance[i]=0.0;
+	}
+	velocityData.twist.covariance[0] = velocityData.twist.covariance[7] = velocityData.twist.covariance[14]=0.001;
+	velocityData.twist.covariance[21]= velocityData.twist.covariance[28]= velocityData.twist.covariance[35]=0.01;
 	//conversion of angular velocity to ENU frame of reference
 	tf::Quaternion oq;
 	data.getOrientationQuaternion(&oq);
-	
+
 	tf::Quaternion local_w(data.gyroscope_x(), data.gyroscope_y(), data.gyroscope_z(), 1.0);
 	tf::Quaternion global_w = oq * local_w * oq.inverse();
 	//RPY in ENU frame
 	double groll, gpitch, gyaw;
 	tf::Matrix3x3(global_w).getRPY(groll,gpitch, gyaw);
-	velocityData.angular.x = groll;
-	velocityData.angular.y = gpitch;
-	velocityData.angular.z = gyaw;
+	velocityData.twist.twist.angular.x = groll;
+	velocityData.twist.twist.angular.y = gpitch;
+	velocityData.twist.twist.angular.z = gyaw;
 
-	velocityData.linear.x = data.velocity_x();
-	velocityData.linear.y = data.velocity_y();
-	velocityData.linear.z = data.velocity_z();
-	res.twist=velocityData;
+	velocityData.twist.twist.linear.x = data.velocity_x();
+	velocityData.twist.twist.linear.y = data.velocity_y();
+	velocityData.twist.twist.linear.z = data.velocity_z();
 
-	stamped.header.frame_id = data.frameId();
-	stamped.header.stamp = ros::Time::now();
-	return stamped;
+
+	velocityData.header.frame_id = data.frameId();
+	velocityData.header.stamp = ros::Time::now();
+	return velocityData;
 
 
 }
@@ -160,29 +159,28 @@ geometry_msgs::TwistWithCovarianceStamped MessageMaker::fillVelocityMessage(){
  * The data is collected from the device's gyroscopes and GPS
  */
 geometry_msgs::TwistWithCovarianceStamped MessageMaker::fillGpsVelocityMessage(){
-	geometry_msgs::TwistWithCovarianceStamped stamped;
-	geometry_msgs::TwistWithCovariance res;
-	geometry_msgs::Twist velocityData;
-	for(int i=0;i<36;i++){
-		res.covariance[i]=0.0;
-	} 
-	res.covariance[0]=res.covariance[7]=res.covariance[14]=0.001;
-	res.covariance[21]=res.covariance[28]=res.covariance[35]=0.01;
+	geometry_msgs::TwistWithCovarianceStamped velocityData;
+
+	for(int i=0; i<36; i++){
+		velocityData.twist.covariance[i]=0.0;
+	}
+	velocityData.twist.covariance[0] = velocityData.twist.covariance[7] = velocityData.twist.covariance[14]=0.001;
+	velocityData.twist.covariance[21]= velocityData.twist.covariance[28]= velocityData.twist.covariance[35]=0.01;
 	//conversion of angular velocity to ENU frame of reference
-	
-	velocityData.angular.x = 0.0;
-	velocityData.angular.y = 0.0;
-	velocityData.angular.z = 0.0;
 
-	velocityData.linear.x = data.gps_velocity_x();
-	velocityData.linear.y = data.gps_velocity_y();
-	velocityData.linear.z = data.gps_velocity_z();
-	res.twist=velocityData;
 
-	stamped.header.frame_id = data.frameId();
-	stamped.header.stamp = ros::Time::now();
-	return stamped;
+	velocityData.twist.twist.angular.x = 0.0;
+	velocityData.twist.twist.angular.y = 0.0;
+	velocityData.twist.twist.angular.z = 0.0;
 
+  	velocityData.twist.twist.linear.x = data.gps_velocity_x();
+  	velocityData.twist.twist.linear.y = data.gps_velocity_y();
+	velocityData.twist.twist.linear.z = data.gps_velocity_z();
+
+
+	velocityData.header.frame_id = data.frameId();
+	velocityData.header.stamp = ros::Time::now();
+	return velocityData;
 
 }
 
@@ -193,7 +191,7 @@ geometry_msgs::TwistWithCovarianceStamped MessageMaker::fillGpsVelocityMessage()
  */
 sensor_msgs::Temperature MessageMaker::fillTemperatureMessage(){
 	sensor_msgs::Temperature tempData;
-	
+
 	tempData.header.frame_id = data.frameId();
 	tempData.header.stamp = ros::Time::now();
 
@@ -209,7 +207,7 @@ sensor_msgs::Temperature MessageMaker::fillTemperatureMessage(){
  */
 sensor_msgs::FluidPressure MessageMaker::fillPressureMessage(){
 	sensor_msgs::FluidPressure pressureData;
-	
+
 	pressureData.header.frame_id = data.frameId();
 	pressureData.header.stamp = ros::Time::now();
 
@@ -220,13 +218,13 @@ sensor_msgs::FluidPressure MessageMaker::fillPressureMessage(){
 }
 
 /**
- * @brief Creates a sensor_msgs/MagneticField ROS message from sensor data    
+ * @brief Creates a sensor_msgs/MagneticField ROS message from sensor data
  * @details Uses data collected from the device's magnetometer
- * @see SensorData::magnetic_x()	
+ * @see SensorData::magnetic_x()
  */
 sensor_msgs::MagneticField MessageMaker::fillMagneticFieldMessage(){
 	sensor_msgs::MagneticField magneticData;
-	
+
 	magneticData.header.frame_id = data.frameId();
 	magneticData.header.stamp = ros::Time::now();
 
@@ -241,18 +239,18 @@ geometry_msgs::Vector3Stamped MessageMaker::fillRPYMessage(){
 	geometry_msgs::Vector3Stamped rpyData;
 	rpyData.header.frame_id = data.frameId();
 	rpyData.header.stamp = ros::Time::now();
-	
+
 	rpyData.vector.x = data.roll();
 	rpyData.vector.y = data.pitch();
 	rpyData.vector.z = data.yaw();
-	
+
 	return rpyData;
 }
 
-/**		
- * @brief Creates a custom mtig_driver/GpsInfo ROS message from sensor data  
+/**
+ * @brief Creates a custom mtig_driver/GpsInfo ROS message from sensor data
  * @details This message contains important information from the Xsens' GPS
- * that no other ROS Message accounted for. 
+ * that no other ROS Message accounted for.
  */
 mtig_driver::GpsInfo MessageMaker::fillGpsInfoMessage(){
 	mtig_driver::GpsInfo gps_info;
@@ -268,13 +266,13 @@ mtig_driver::GpsInfo MessageMaker::fillGpsInfoMessage(){
 	gps_info.horizontalDOP = data.hdop();
 	gps_info.eastingDOP = data.edop();
 	gps_info.northingDOP = data.ndop();
-	 
+
 	gps_info.itow = data.itow();
 
 	//POSITION AND SPEED ACCURACY
 	gps_info.position_accuracy = data.PositionAccuracy();
 	gps_info.speed_accuracy = data.SpeedAccuracy();
-	
+
 	//NUMBER OF SATELLITES USED IN GPS ACQUISITION
 	gps_info.satellite_number = data.SatelliteNumber();
 

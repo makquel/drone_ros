@@ -11,13 +11,15 @@
 #define SENSOR_DATA
 #include "global.h"
 #include <tf/tf.h>
+#include <ros/console.h>
+#include <xsens/xsrawgnsspvtdata.h>
 
 //[Manual] http://amtechs.co.jp/2_gps/pdf/MTi%20User%20Manual.pdf
 
 class SensorData{
 	//Mti-G Data
 private:
-	static const unsigned char GPS_FIX   = 0x04; 
+	static const unsigned char GPS_FIX   = 0x04;
 	float accX, accY, accZ;
 	float acc_error;
 	float gyrX, gyrY, gyrZ;
@@ -31,7 +33,7 @@ private:
     	unsigned int ts;
 	tf::Quaternion q_orientation;
 
-	
+
 	float m_hdop, m_vdop, m_gdop, m_pdop, m_tdop, m_ndop, m_edop, m_itow;
 	float mPositionAccuracy, mSpeedAccuracy;
 	int mSatelliteNumber, mGpsFixStatus;
@@ -39,6 +41,7 @@ private:
 	float mAltitude, mLongitude, mLatitude;
 	float mVelocityNorth, mVelocityEast, mVelocityDown;
 	float mVelocityX, mVelocityY, mVelocityZ;
+	float mgpsVelocityX, mgpsVelocityY, mgpsVelocityZ;
 	float gpsVelocityX, gpsVelocityY, gpsVelocityZ;
 	unsigned char mStatus;
 	uint32_t mHorizontalAccuracy, mVerticalAccuracy;
@@ -55,7 +58,7 @@ public:
 	float ndop(){ return m_ndop;}
 	float edop(){ return m_edop;}
 	float itow(){ return m_itow;}
-	
+
 
 	float accError() {return acc_error;}
 	float gyrError() {return gyr_error;}
@@ -74,10 +77,10 @@ public:
 
 	float PositionAccuracy() { return mPositionAccuracy; }
 	float SpeedAccuracy() { return mSpeedAccuracy; }
-	
+
 	int SatelliteNumber() { return mSatelliteNumber; }
 	int GpsFixStatus() { return mGpsFixStatus;}
-	  
+
 	float accelerometer_x() { return accX; }
 	float accelerometer_y() { return accY; }
 	float accelerometer_z() { return accZ; }
@@ -85,11 +88,11 @@ public:
 	float gyroscope_x() { return gyrX; }
 	float gyroscope_y() { return gyrY; }
 	float gyroscope_z() { return gyrZ; }
-	
-	float magnetic_x() { return magX; } 
+
+	float magnetic_x() { return magX; }
 	float magnetic_y() { return magY; }
 	float magnetic_z() { return magZ; }
-	
+
 	float temperature() { return mTemperature; }
 	float pressure() { return mPressure; }
 
@@ -105,26 +108,26 @@ public:
 	float altitude() { return mAltitude; }
 	float longitude() { return mLongitude; }
 	float latitude() { return mLatitude; }
-	
+
 	//frame local
 	float velocity_x() { return mVelocityX; }
 	float velocity_y() { return mVelocityY; }
 	float velocity_z() { return mVelocityZ; }
-	
+
 	//Velocidade do GPS - RawGpsSol
-	float gps_velocity_x() { return gpsVelocityX; }
-	float gps_velocity_y() { return gpsVelocityY; }
-	float gps_velocity_z() { return gpsVelocityZ; }
-		
+	float gps_velocity_x() { return mgpsVelocityX; }
+	float gps_velocity_y() { return mgpsVelocityY; }
+	float gps_velocity_z() { return mgpsVelocityZ; }
+
 	float velocityNorth() { return mVelocityNorth; }
 	float velocityEast() { return mVelocityEast; }
 	float velocityDown() { return mVelocityDown; }
 
-	bool GPSFix() { return mGpsFixStatus; } 
+	bool GPSFix() { return mGpsFixStatus; }
 
 	uint32_t horizontalAccuracy() { return mHorizontalAccuracy; }
 	uint32_t verticalAccuracy() { return mVerticalAccuracy; }
-		
+
 	std::string 	frameId() { return frameId_string; }
 
 	SensorData(outputSettings &mSettings);

@@ -11,11 +11,11 @@ class Temp2Mav: public protomav::MavMessenger{
 public:
   Temp2Mav();
   void send();
-  
+
 private:
   void pressureCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure);
   void tempCallback( const sensor_msgs::Temperature::ConstPtr& temp);
- 
+
   ros::Subscriber temp_sub;
   ros::Subscriber pressure_sub;
   mavlink_scaled_pressure_t mav_pressure;

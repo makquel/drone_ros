@@ -3,21 +3,21 @@
 
 
 #include <protomav/MavMessenger.h>
-#include <sensor_msgs/FluidPressure.h>
-
+#include <sensor_msgs/BatteryState.h>
+#include <yocto/voltage_info.h>
 
 
 class SoC2Mav: public protomav::MavMessenger{
 public:
   SoC2Mav();
-  void send();
-  
+  virtual void send();
+
 private:
-  void voltageCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure);
-  
- 
+  void voltageCallback(const yocto::voltage_info::ConstPtr& voltage);
+
+
   ros::Subscriber voltage_sub;
   mavlink_battery_status_t mav_soc;
-  
+
 };
 #endif

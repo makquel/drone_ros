@@ -188,6 +188,7 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
 add_executable(sf11c_node src/sf11C.cpp)
-target_link_libraries(sf11c_node ${catkin_LIBRARIES})
-add_dependencies(sf11c_node beginner_tutorials_generate_messages_cpp)
+add_dependencies(sf11c_node serial sf11_altimeter_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sf11c_node serial ${catkin_LIBRARIES})

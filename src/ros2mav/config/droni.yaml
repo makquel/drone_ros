@@ -1,4 +1,4 @@
-system_id: 2
+system_id: 1
 comp_id: 240
 
 mav_topic: mavlink/from
@@ -13,5 +13,6 @@ rpy_topic: /xsens/rpy
 temp_topic: /xsens/temperature
 pressure_topic: /xsens/pressure
 altitude_topic: /altitude
-gspeed_topic: /airspeed
-#voltage_topic: /ADC0
+airspeed_topic: /airspeed_msg
+voltage_topic: /yocto/voltage_info
+throttle_topic: /yocto/PWM_info

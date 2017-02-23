@@ -1,0 +1,13 @@
+<library path="lib/libfakecam">
+  <class name="fakecam/fakecam" type="fakecam::FakecamNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      A node to publish fake images.
+    </description>
+  </class>
+  <class name="fakecam/NodeletThrottleImage" type="fakecam::NodeletThrottleImage" base_class_type="nodelet::Nodelet">
+    <description>
+      A node to throttle images.
+    </description>
+  </class>
+</library>
+

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.4.6)
 project(mtig_driver)
 
-find_package(catkin REQUIRED COMPONENTS 
-	roscpp 
-	std_msgs 
+find_package(catkin REQUIRED COMPONENTS
+	roscpp
+	std_msgs
 	message_generation
 	tf
 )
@@ -20,15 +20,11 @@ generate_messages(
 
 
 catkin_package(
-			INCLUDE_DIRS include			
+			INCLUDE_DIRS include
 			LIBRARIES ${PROJECT_NAME}
 			CATKIN_DEPENDS roscpp tf
 			DEPENDS message_runtime
 )
-
-
-
-
 
 
 # Set the build type.  Options are:
@@ -70,4 +66,5 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 #set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /opt/local/lib)
 add_executable(mtig_driver_node src/main.cpp src/console.cpp src/conio.c src/myxda.cpp src/serialkey.cpp src/mtiG.cpp src/messageMaker.cpp src/sensorData.cpp)
+add_dependencies(mtig_driver_node mtig_driver_generate_messages_cpp)
 target_link_libraries(mtig_driver_node m xsensdeviceapi xstypes pthread ${catkin_LIBRARIES})

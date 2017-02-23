@@ -1,12 +1,12 @@
 /**
  * @file mtiG.cpp
  * @brief ROS driver for Xsens mti-G-700.
- * 
+ *
  * @details This class is the main part of a driver for Xsens mti-G-700.
  * 	It reads packets from the device using the Xsens API - see disclosure below.
  * 	It stores the data in another class, named SensorData and
  * 	uses MessageMaker to publish this data in ROS topics.
- * 
+ *
  * @author Lucas Casanova Nogueira (lucas_afonso@hotmail.com)
  * @date 2014
  */
@@ -66,7 +66,7 @@ mtiG::mtiG(XsDevice * _device){
 
 /**
  * @brief Parses the parameters from the launchfile.
- * @details 
+ * @details
  * - Enables individual data packets.
  * - Sets the frequency of each module.
  */
@@ -107,10 +107,10 @@ void mtiG::printSettings(){
 	{
  			ROS_DEBUG("%.8x; Freq = %d", deviceConfig[i].m_dataIdentifier, deviceConfig[i].m_frequency);
 	}
-	
+
 	//Print the settings stored in mSettings
 	ROS_DEBUG_STREAM(
-	"\nOrientation = " << mSettings.orientationData << 
+	"\nOrientation = " << mSettings.orientationData <<
 	"\nGPS = " << mSettings.gpsData <<
 	"\nTemperature = " << mSettings.temperatureData <<
 	"\nAcceleration = " << mSettings.accelerationData <<
@@ -127,14 +127,14 @@ void mtiG::printSettings(){
 	"\nMagnetic Frequency:" << mSettings.magneticFreq <<
 	"\nAltitude Frequency:" << mSettings.altitudeFreq <<
 	"\nGyroscope Frequency:" << mSettings.gyroscopeFreq <<
-	"\nVelocity Frequency:" << mSettings.velocityFreq 
+	"\nVelocity Frequency:" << mSettings.velocityFreq
 	);
 }
 
 /**
  *  @brief Pulls the active configuration from the device.
  *  @details Fills mSettings from XsOutputConfigurationArray, the current
- *  active settings in the Xsens. 
+ *  active settings in the Xsens.
  */
 void mtiG::readSettings(){
 
@@ -142,7 +142,7 @@ void mtiG::readSettings(){
 	XsOutputConfigurationArray deviceConfig = device->outputConfiguration();
 
 	//default initialization
-	mSettings.orientationData = false; 
+	mSettings.orientationData = false;
 	mSettings.gpsData = false;
 	mSettings.temperatureData = false;
 	mSettings.accelerationData = false;
@@ -165,37 +165,41 @@ void mtiG::readSettings(){
 				case (XDI_LatLon):
 				case (XDI_GpsAge):
 				case (XDI_GpsDop):
-				case (XDI_GpsSol):
-					ROS_DEBUG("GPS ENABLED IN CURRENT CONFIGURATION");					
-					mSettings.gpsData=true;			
+				case (XDI_GpsSol): //CEFET reference frame
+					ROS_DEBUG("GPS ENABLED IN CURRENT CONFIGURATION");
+					mSettings.gpsData=true;
 					break;
+				//case (XDI_GnssPvtData): //ENU / END reference frame
+						//ROS_DEBUG("GPS ENABLED IN CURRENT CONFIGURATION");
+						//mSettings.gpsData=true;
+						//break;
 				// TEMPERATURE
 				case (XDI_Temperature):
-					mSettings.temperatureData=true;			
+					mSettings.temperatureData=true;
 					break;
 				// ACCELERATION
 				case (XDI_Acceleration):
-					mSettings.accelerationData=true;			
+					mSettings.accelerationData=true;
 					break;
 				// PRESSURE
 				case (XDI_BaroPressure):
-					mSettings.pressureData=true;			
+					mSettings.pressureData=true;
 					break;
 				// MAGNETIC
 				case (XDI_MagneticField):
-					mSettings.magneticData=true;			
+					mSettings.magneticData=true;
 					break;
 				// ALTITUDE
 				case (XDI_AltitudeEllipsoid):
-					mSettings.altitudeData=true;			
+					mSettings.altitudeData=true;
 					break;
-				// GYROSCOPE 
+				// GYROSCOPE
 				case (XDI_RateOfTurn):
-					mSettings.gyroscopeData=true;			
+					mSettings.gyroscopeData=true;
 					break;
 				// VELOCITY
 				case (XDI_VelocityXYZ):
-					mSettings.velocityData=true;			
+					mSettings.velocityData=true;
 					break;
 
 			}
@@ -217,7 +221,7 @@ void mtiG::configure(){
 			XsOutputConfiguration quat(XDI_Quaternion, mSettings.orientationFreq);// para pedir quaternion
 			configArray.push_back(quat);
 	}
-	
+
 	if(mSettings.gpsData){
 			//LATITUDE E LONGITUDE -containsLatitudeLongitude
 			XsOutputConfiguration gps(XDI_LatLon, mSettings.gpsFreq);// para pedir gps, //XDI_Quaternion 06/04
@@ -226,26 +230,28 @@ void mtiG::configure(){
 			XsOutputConfiguration gps_age(XDI_GpsAge, mSettings.gpsFreq);// para pedir gps, //XDI_Quaternion 06/04
 			configArray.push_back(gps_age);
 
-			XsOutputConfiguration gps_sol(XDI_GpsSol, mSettings.gpsFreq);// para pedir gps, //XDI_Quaternion 06/04
+			//XsOutputConfiguration gps_sol(XDI_GpsSol, mSettings.gpsFreq);// para pedir gps, //XDI_Quaternion 06/04
+			//TODO: Change gps_sol callback to gnss
+			XsOutputConfiguration gps_sol(XDI_GnssPvtData, mSettings.gpsFreq);// para pedir gps, //XDI_Quaternion 06/04
 			configArray.push_back(gps_sol);
 
 			XsOutputConfiguration gps_dop(XDI_GpsDop, mSettings.gpsFreq);// para pedir gps, //XDI_Quaternion 06/04
 			configArray.push_back(gps_dop);
 	}
-	
-	if(mSettings.temperatureData){	
+
+	if(mSettings.temperatureData){
 			//TEMPERATURA - containsTemperature
 			XsOutputConfiguration temp(XDI_Temperature, mSettings.temperatureFreq);
 			configArray.push_back(temp);
-	}	
-	
+	}
+
 	if(mSettings.accelerationData){
 			//ACCELERATION - containsCalibratedAcceleration
 			XsOutputConfiguration accel(XDI_Acceleration, mSettings.accelerationFreq);
 			configArray.push_back(accel);
 	}
 
-	if(mSettings.pressureData){	
+	if(mSettings.pressureData){
 			//PRESSURE - containsPressure
 			XsOutputConfiguration baro(XDI_BaroPressure, mSettings.pressureFreq);
 			configArray.push_back(baro);
@@ -267,14 +273,14 @@ void mtiG::configure(){
 			//GYRO - containsCalibratedGyroscopeData
 			XsOutputConfiguration gyro(XDI_RateOfTurn, mSettings.gyroscopeFreq);
 			configArray.push_back(gyro);
-	}	
+	}
 
 	if(mSettings.velocityData){
 			//VELOCIDADE XYZ
 			XsOutputConfiguration vel_xyz(XDI_VelocityXYZ, mSettings.velocityFreq);
 			configArray.push_back(vel_xyz);
 	}
-	
+
 	// Puts configArray into the device, overwriting the current configuration
 	if (!device->setOutputConfiguration(configArray))
 	{
@@ -288,7 +294,7 @@ void mtiG::configure(){
  * in mSettings
  */
 void mtiG::advertise(){
-	
+
 	ros::NodeHandle nh;
 	int queue_size;
 	ros::param::param<int>("~queue_size", queue_size, 50);
@@ -304,13 +310,13 @@ void mtiG::advertise(){
 		velPublisher = nh.advertise<geometry_msgs::TwistWithCovarianceStamped> ("xsens/velocity", queue_size);
 		gpsVelPublisher = nh.advertise<geometry_msgs::TwistWithCovarianceStamped> ("xsens/gps_vel", queue_size);
 	}
-	if(mSettings.temperatureData){	
+	if(mSettings.temperatureData){
 		tempPublisher = nh.advertise<sensor_msgs::Temperature>("xsens/temperature", queue_size);
 	}
 	if(mSettings.magneticData){
 		magFieldPub = nh.advertise<sensor_msgs::MagneticField>("xsens/magnetic", queue_size);
 	}
-	if(mSettings.pressureData){	
+	if(mSettings.pressureData){
 		pressurePublisher = nh.advertise<sensor_msgs::FluidPressure>("xsens/pressure", queue_size);
 	}
 
@@ -335,13 +341,13 @@ void mtiG::publish(){
 		velPublisher.publish( messageMaker->fillVelocityMessage() );
 		gpsVelPublisher.publish( messageMaker->fillGpsVelocityMessage() );
 	}
-	if(mSettings.temperatureData){	
+	if(mSettings.temperatureData){
 		tempPublisher.publish( messageMaker->fillTemperatureMessage() );
 	}
 	if(mSettings.magneticData){
 		magFieldPub.publish( messageMaker->fillMagneticFieldMessage() );
 	}
-	if(mSettings.pressureData){	
+	if(mSettings.pressureData){
 		pressurePublisher.publish( messageMaker->fillPressureMessage() );
 	}
 }

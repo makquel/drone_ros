@@ -11,10 +11,10 @@
 #include "sensorData.h"
 
 /**
- * @brief Initializes all data with blank values 
+ * @brief Initializes all data with blank values
  */
 SensorData::SensorData(	outputSettings  & mSettings){
-  
+
 	accX = accY = accZ = 0.0;
 	gyrX = gyrY = gyrZ = 0.0;
 	magX = magY = magZ = 0.0;
@@ -23,41 +23,42 @@ SensorData::SensorData(	outputSettings  & mSettings){
 	mTemperature = mPressure = 0.0;
 	mVelocityX = mVelocityY = mVelocityZ = 0.0;
 	gpsVelocityX = gpsVelocityY = gpsVelocityZ = 0.0;
+	mgpsVelocityX = mgpsVelocityY = mgpsVelocityZ = 0.0;
 	mStatus = 0;
 	mHorizontalAccuracy = mVerticalAccuracy = 0;
 	mAltitude = mLongitude = mLatitude = 0.0;
 	mVelocityNorth = mVelocityEast = mVelocityDown = 0.0;
-	
-	
+
+
 
 	//Get measurements errors from the launchfile. They should be already ^2 because they'll go straight to the covariance matrix
 	if(ros::param::get("~roll_error", roll_error)){
-		roll_error=to_rad_sqr(roll_error);		
+		roll_error=to_rad_sqr(roll_error);
 	}
 	else{
-		ROS_ERROR("No roll_error value defined in launchfile");	
+		ROS_ERROR("No roll_error value defined in launchfile");
 	}
 
 	if(ros::param::get("~pitch_error", pitch_error)){
-		pitch_error=to_rad_sqr(pitch_error);		
+		pitch_error=to_rad_sqr(pitch_error);
 	}
 	else{
-		ROS_ERROR("No pitch_error value defined in launchfile");	
+		ROS_ERROR("No pitch_error value defined in launchfile");
 	}
 
 	if(ros::param::get("~yaw_error", yaw_error)){
-		yaw_error=to_rad_sqr(yaw_error);		
+		yaw_error=to_rad_sqr(yaw_error);
 	}
 	else{
-		ROS_ERROR("No yaw_error value defined in launchfile");	
+		ROS_ERROR("No yaw_error value defined in launchfile");
 	}
 
 	if(!ros::param::get("~acc_noise", acc_noise)){
-		ROS_ERROR("No acc_error value defined in launchfile");	
+		ROS_ERROR("No acc_error value defined in launchfile");
 	}
 	else{
 		acc_error=calculateAccErrorSquared(acc_noise, mSettings.accelerationFreq);
-	}	
+	}
 
 	if(!ros::param::get("~gyr_noise", gyr_noise)){
 		ROS_ERROR("No noise_density value defined in launchfile");
@@ -77,7 +78,7 @@ SensorData::SensorData(){
 
 /**
  *	\brief Obtains the Acceleration Error ^2 from the noise density and sensor frequency
- *      \param noise_density in [g/sqrt(Hz)], 
+ *      \param noise_density in [g/sqrt(Hz)],
  *      \param freq  in [Hz],
  *      \return error in (m/s^2)^2
  */
@@ -89,7 +90,7 @@ float SensorData::calculateAccErrorSquared(float noise_density, float freq){
 
 /**
  *      \brief Obtains the Gyroscope Error ^2 from the noise density and the sensor frequency
- *      \param noise_density in [g/sqrt(Hz)] 
+ *      \param noise_density in [g/sqrt(Hz)]
  *      \param freq  in [Hz]
  *      \return error in (m/s^2)^2
  */
@@ -98,7 +99,7 @@ float SensorData::calculateGyrErrorSquared(float noise_density, float freq){
 }
 
 /**
- * \brief Fills data using XsDataPacket object 
+ * \brief Fills data using XsDataPacket object
  * @param _packet Incoming packet from Xsens device.
  */
 void SensorData::fillData(XsDataPacket * _packet){
@@ -108,7 +109,7 @@ void SensorData::fillData(XsDataPacket * _packet){
 
 		ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "Data Size: " << msg_size);
 
-		
+
 	// Get the orientation data
 		if (packet.containsOrientation()) {
 			XsQuaternion quaternion = packet.orientationQuaternion();
@@ -117,28 +118,28 @@ void SensorData::fillData(XsDataPacket * _packet){
 			q2 = quaternion.m_y;
 			q3 = quaternion.m_z;
 			q0 = quaternion.m_w;
-						
+
 			XsEuler euler = packet.orientationEuler();
 			eroll = euler.m_roll;
 			epitch = euler.m_pitch;
 			eyaw = euler.m_yaw;
- 			
+
 			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE,"Orientation: Roll:" << std::setw(7) << std::fixed << std::setprecision(2) << euler.m_roll
 							  << ", Pitch:" << std::setw(7) << std::fixed << std::setprecision(2) << euler.m_pitch
 							  << ", Yaw:" << std::setw(7) << std::fixed << std::setprecision(2) << euler.m_yaw);
-						
+
 		}
 
 		// Get the gyroscope data
 		if (packet.containsCalibratedGyroscopeData()) {
 			XsVector gyroscope = packet.calibratedGyroscopeData();
-		
+
 			gyrX = gyroscope.at(0);
 			gyrY = gyroscope.at(1);
 			gyrZ = gyroscope.at(2);
 
 			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "Angular Velocity: ( "
-							 << gyrX << ", " << gyrY << ", " << gyrZ << ")" ); 
+							 << gyrX << ", " << gyrY << ", " << gyrZ << ")" );
 		}
 
 		// Get the acceleration data
@@ -148,7 +149,7 @@ void SensorData::fillData(XsDataPacket * _packet){
 			accX = acceleration.at(0);
 			accY = acceleration.at(1);
 			accZ = acceleration.at(2);
-			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "Linear Acceleration: (" 
+			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "Linear Acceleration: ("
 							<< accX << "," << accX << "," << accZ << ")" );
 		}
 
@@ -158,7 +159,7 @@ void SensorData::fillData(XsDataPacket * _packet){
 			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "containsAltitude: ");
 		}
 
-			
+
 		//Get the Latitude and Longitude Data
 		if(packet.containsLatitudeLongitude()){
 			XsVector latlon = packet.latitudeLongitude();
@@ -171,14 +172,14 @@ void SensorData::fillData(XsDataPacket * _packet){
 		if (packet.containsCalibratedMagneticField()) {
 			XsVector magneticField = packet.calibratedMagneticField();
 
-			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "Magnetic Field: ("<< magneticField[0] <<" , " 
-							<< magneticField[1] << " , "<< magneticField[2]   << ")");	
+			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "Magnetic Field: ("<< magneticField[0] <<" , "
+							<< magneticField[1] << " , "<< magneticField[2]   << ")");
 
 			magX = magneticField.at(0);
 			magY = magneticField.at(1);
 			magZ = magneticField.at(2);
 		}
-					
+
 		// Get Temperature data
 		if (packet.containsTemperature()){
 			double temperature = packet.temperature();
@@ -186,30 +187,42 @@ void SensorData::fillData(XsDataPacket * _packet){
 			mTemperature = temperature;
 		}
 
-		// Get Pressure Data 
+		// Get Pressure Data
 		if(packet.containsPressure() ){
 			XsPressure pressure = packet.pressure();
 			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "Pressure : " << pressure.m_pressure);
 			mPressure= pressure.m_pressure;
-		}	
-	
+		}
+
 		// Get Velocity Data
 		if( packet.containsVelocity() ){
+			//ROS_INFO("It contains filtered vel!");
 			XsVector velocity = packet.velocity();
 			mVelocityX = velocity.at(0);
 			mVelocityY = velocity.at(1);
 			mVelocityZ = velocity.at(2);
 
-			ROS_INFO_STREAM(" Velocity [ x (east) : " << mVelocityX << ", y (north) : "
-					<< mVelocityY << ", z (up) " << mVelocityZ << " ]");
+			//ROS_INFO_STREAM(" Velocity [ x (east) : " << mVelocityX << ", y (north) : "	<< mVelocityY << ", z (up) " << mVelocityZ << " ]");
 		}
 
 
 		// Get GPS PVT Data
-		if( packet.containsGpsPvtData() ){
+		/*if( packet.containsGpsPvtData() ){
 			XsGpsPvtData gpsPvtData = packet.gpsPvtData();
-			ROS_INFO_STREAM(" Horizontal accuracy: " << gpsPvtData.m_hacc ); 
-		}
+			ROS_INFO_STREAM("gpsPvtData: ");
+
+			mPositionAccuracy = gpsPvtData.m_hacc;
+			mSpeedAccuracy = gpsPvtData.m_sacc;
+			//mSatelliteNumber = gpsPvtData.m_numSv;
+			//mGpsFixStatus = gpsPvtData.m_fixType;
+
+			//#xsgpspvtdata.h
+			mgpsVelocityX = ((float)gpsPvtData.m_veln)/100;
+			mgpsVelocityY = ((float)gpsPvtData.m_vele)/100;
+			mgpsVelocityZ = ((float)gpsPvtData.m_veld)/100;
+			ROS_INFO_STREAM(" Velocity [ x (east) : " << mgpsVelocityX << ", y (north) : " << mgpsVelocityY << ", z (up) " << mgpsVelocityZ << " ]");
+
+		}*/
 
 		if(packet.containsRawAcceleration() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "Raw Acceleration") ;}
 		if(packet.containsRawGyroscopeData() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "Raw Gyroscope") ;}
@@ -230,8 +243,8 @@ void SensorData::fillData(XsDataPacket * _packet){
 		if(packet.containsPressureAge() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "PressureAge");}
 		if(packet.containsAnalogIn1Data() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "AN1IN");}
 		if(packet.containsAnalogIn2Data() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "AN2IN");}
-		if(packet.containsPositionLLA() ){ 
-			
+		if(packet.containsPositionLLA() ){
+
 			XsVector posLLA = packet.positionLLA();
 			mLatitude = posLLA[0];
 			mLongitude = posLLA[1];
@@ -241,13 +254,13 @@ void SensorData::fillData(XsDataPacket * _packet){
 			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "mAltitude = " << mAltitude);
 
 			//for(int i=0; i < posLLA.size(); i++){
-			//ROS_INFO_STREAM("posLLA[" << i << "] : " << posLLA[i] ); 
+			//ROS_INFO_STREAM("posLLA[" << i << "] : " << posLLA[i] );
 			//}
 		}
 		if(packet.containsUtcTime() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "UTC-Time");}
 		if(packet.containsFrameRange() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "Frame Range");}
 		if(packet.containsRssi() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "RSSI");}
-		if(packet.containsRawGpsDop() ){ 
+		if(packet.containsRawGpsDop() ){
 			//ROS_INFO_THROTTLE(THROTTLE_VALUE, "DOP");}
 			XsRawGpsDop dop = packet.rawGpsDop();
 			m_gdop = ((float) dop.m_gdop)/100;
@@ -259,32 +272,56 @@ void SensorData::fillData(XsDataPacket * _packet){
 			m_ndop = ((float) dop.m_ndop)/100;
 			m_itow = ((float) dop.m_itow)/1000;
 
-			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, 
+			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE,
 						"GDOP = " << m_gdop <<
-						",PDOP = " << m_pdop <<						
-						",TDOP = " << m_tdop <<						
-						",VDOP = " << m_vdop <<						
-						",HDOP = " << m_hdop <<						
-						",EDOP = " << m_edop <<						
-						",NDOP = " << m_ndop <<						
-						",ITOW = " << m_itow);			
+						",PDOP = " << m_pdop <<
+						",TDOP = " << m_tdop <<
+						",VDOP = " << m_vdop <<
+						",HDOP = " << m_hdop <<
+						",EDOP = " << m_edop <<
+						",NDOP = " << m_ndop <<
+						",ITOW = " << m_itow);
 		}
-		if(packet.containsRawGpsSol() ){
-			// ROS_INFO_THROTTLE(THROTTLE_VALUE, "SOL");}
+		/*if(packet.containsRawGpsSol() ){
+			ROS_INFO_THROTTLE(THROTTLE_VALUE, "GpsSol:");//}
+			//ROS_WARN("It contains raw gps sol!");
 			XsRawGpsSol sol = packet.rawGpsSol();
 			mPositionAccuracy = sol.m_pacc;
 			mSpeedAccuracy = sol.m_sacc;
 			mSatelliteNumber = sol.m_numsv;
 			mGpsFixStatus = sol.m_gpsfix;
-			
-			gpsVelocityX=sol.m_ecef_vx/100;
-			gpsVelocityY=sol.m_ecef_vy/100;
-			gpsVelocityZ=sol.m_ecef_vz/100;
-			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE,
+  		///xsrawgpssol.h
+			mgpsVelocityX = ((float)sol.m_ecef_vx)/100;
+			mgpsVelocityY = ((float)sol.m_ecef_vy)/100;
+			mgpsVelocityZ = ((float)sol.m_ecef_vz)/100;
+			ROS_INFO_STREAM(" Velocity [ vx : " << mgpsVelocityX << ", vy : " << mgpsVelocityY << ", vz " << mgpsVelocityZ << " ]");
+
+      ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE,
 						"Pos Acc = " << mPositionAccuracy <<
 						",Speed Acc = " << mSpeedAccuracy <<
 						",Sat Number = " << mSatelliteNumber <<
 						",GPS FIX = " << std::hex << mGpsFixStatus);
+		}*/
+
+		if(packet.containsRawGnssPvtData()){
+		//if( packet.containsGpsPvtData() ){
+		//if( packet.containsRawGnssSatInfo() ){
+			ROS_INFO_STREAM_THROTTLE(THROTTLE_VALUE, "GnnssPvtData:");
+
+			XsRawGnssPvtData gnss = packet.rawGnssPvtData();
+			mPositionAccuracy = gnss.m_hAcc;
+			mSpeedAccuracy = gnss.m_sAcc;
+			mSatelliteNumber = gnss.m_numSv;
+			mGpsFixStatus = gnss.m_fixType;
+
+			///xsrawgnsspvtdata.h
+			//East alinhado com o vetor x
+			//North alinhado com o vetor y
+			//Up Alinhado com o vetor z
+			mgpsVelocityX = ((float)gnss.m_velE)/1000;
+			mgpsVelocityY = ((float)gnss.m_velN)/1000;
+			mgpsVelocityZ = ((float)gnss.m_velD)/1000;
+			ROS_INFO_STREAM("Velocity [ x (east) : " << mgpsVelocityX << ", y (north) : " << mgpsVelocityY << ", z (up) " << mgpsVelocityZ << " ]");
 		}
 		if(packet.containsRawGpsTimeUtc() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "GPS-UTC");}
 		if(packet.containsRawGpsSvInfo() ){ ROS_INFO_THROTTLE(THROTTLE_VALUE, "SV INFO");}
@@ -293,10 +330,9 @@ void SensorData::fillData(XsDataPacket * _packet){
 
 
 
-		//Get Status byte		
+		//Get Status byte
 		if( packet.containsStatus() ){
 			mStatus = packet.status();
 			ROS_INFO_THROTTLE(10, "Status: %.8X", mStatus);
 		}
 }
-

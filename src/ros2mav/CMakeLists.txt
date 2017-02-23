@@ -7,7 +7,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs mavros tf  protomav geodesy mtig_driver_msgs)
+find_package(catkin REQUIRED COMPONENTS
+	roscpp
+	std_msgs mavros
+	tf
+	protomav
+	geodesy
+	mtig_driver_msgs
+	yocto
+	ros_pololu_servo
+	)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -81,7 +90,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs mavros tf  protomav geod
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES ros2mav
-  CATKIN_DEPENDS roscpp std_msgs mavros tf protomav geodesy mtig_driver_msgs
+  CATKIN_DEPENDS roscpp std_msgs mavros tf protomav geodesy mtig_driver_msgs #yocto_master
 #  DEPENDS system_lib
 )
 
@@ -94,7 +103,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS}
   include/${PROJECT_NAME}
   )
-  
+
 ## Declare a cpp library
 # add_library(ros2mav
 #   src/${PROJECT_NAME}/ros2mav.cpp
@@ -107,22 +116,24 @@ include_directories(include ${catkin_INCLUDE_DIRS}
  add_executable(ros2att_node src/ros2att.cpp)
  add_executable(temp2mav_node src/temp2mav.cpp)
  add_executable(soc2mav_node src/soc2mav.cpp)
+ #add_executable(alt2mav_node src/alt2mav.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ros2mav_node ros2mav_generate_messages_cpp)
 add_dependencies(gps2mav_node mtig_driver_msgs)
+add_dependencies(soc2mav_node yocto)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(imu2mav_node
    protomav
    ${catkin_LIBRARIES}
  )
- 
+
 target_link_libraries(ros2vfr_node
    protomav
-   ${catkin_LIBRARIES}   
+   ${catkin_LIBRARIES}
  )
- 
+
 target_link_libraries(gps2mav_node
    protomav
    ${catkin_LIBRARIES}
@@ -139,8 +150,14 @@ target_link_libraries(temp2mav_node
 
 target_link_libraries(soc2mav_node
    protomav
+	 yocto
    ${catkin_LIBRARIES}
- )
+)
+
+# target_link_libraries(alt2mav_node
+#    protomav
+#    ${catkin_LIBRARIES}
+#  )
 
 #############
 ## Install ##
@@ -157,7 +174,7 @@ target_link_libraries(soc2mav_node
 # )
 
 # Mark executables and/or libraries for installation
-install(TARGETS imu2mav_node ros2vfr_node gps2mav_node ros2att_node temp2mav_node soc2mav_node
+install(TARGETS imu2mav_node ros2vfr_node gps2mav_node ros2att_node temp2mav_node #soc2mav_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
