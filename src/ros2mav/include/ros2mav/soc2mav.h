@@ -17,7 +17,8 @@ private:
 
 
   ros::Subscriber voltage_sub;
-  mavlink_battery_status_t mav_soc;
+  mavlink_battery_status_t mav_soc; // BATTERY_STATUS #147
+  mavlink_sys_status_t status; // SYS_STATUS ( #74 )
 
 };
 #endif

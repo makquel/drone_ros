@@ -45,10 +45,11 @@ int main(int argc,char**argv)
     }
 
     ros::Rate rate(controller.get_rate_hz());
+    ROS_INFO_THROTTLE(1, "controller_rate: %f", controller.get_rate_hz());
 
     while(ros::ok())
     {
-        ROS_INFO_THROTTLE(1,"publishing\n");
+        ROS_INFO_THROTTLE(1,"Black box live S2\n");
         controller.publish_motor_state();
         controller.publish_digital_state(); //Neste modo o controlador irá fazer a leitura dos canais digitais a todo o momento, assim como o nó do yocto
         ros::spinOnce();

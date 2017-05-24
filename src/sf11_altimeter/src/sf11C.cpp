@@ -16,6 +16,7 @@ serial::Serial ser;
 std::string serial_port;
 int serial_speed;
 bool CTS_status;
+int sampling_rate;
 
 void write_callback(const std_msgs::String::ConstPtr& msg){
     ROS_INFO_STREAM("Writing to serial port" << msg->data.c_str());
@@ -26,6 +27,7 @@ int main (int argc, char** argv){
     //creating the nodde
     ros::init(argc, argv, "sf11c_lightware_node");
     ros::NodeHandle nh;
+    int16_t t_avail = 0;// serial port unavailability
 
     //ros::Subscriber write_sub = nh.subscribe("write", 1000, write_callback);
     ros::Publisher altitude = nh.advertise<sf11_altimeter::sensor_data>("altitude", 5);
@@ -34,9 +36,11 @@ int main (int argc, char** argv){
     //std::vector<unsigned char> airspeed_on(xml_parser_on, xml_parser_on+21);
 
     //setting default device path for the sensor
-    nh.param("serial_port", serial_port, std::string("/dev/sensors/sf11"));
+    nh.param("serial_port", serial_port, std::string("/dev/sensors/sf11")); ///dev/sensors/sf11
     //setting default device communication speed for the sensor
     nh.param("serial_speed", serial_speed, int(115200));
+    // setting default sampling rate
+    nh.param("sampling_rate", sampling_rate, int(16));
     try
     {
         ser.setPort(serial_port);
@@ -61,8 +65,8 @@ int main (int argc, char** argv){
         return -1;
     }
 
-    ros::Rate loop_rate(40); //1Hz
-    ros::Duration duration(1./10.); //0.25s
+
+    ros::Duration duration(1./float(sampling_rate)); //0.25s
 
 
 
@@ -70,19 +74,20 @@ int main (int argc, char** argv){
     duration.sleep(); //Xbee timer after power*up
 
     while(ros::ok()){
-
-        ros::spinOnce();
+      std_msgs::Float32 result;
+      sf11_altimeter::sensor_data msg;
+      ros::spinOnce();
 
         //ser.write(hexstring);
-        duration.sleep();
+        //duration.sleep();
 
         //std::cout << "CTS:" << ser.getCTS() << "\n";
         //std::cout << "Buffer size: " << ser.available() << "\n";
         if(ser.available()){
           //ROS_INFO("I'm in the mood!.");
             //ROS_INFO_STREAM("Reading from serial port");
-            std_msgs::Float32 result;
-            sf11_altimeter::sensor_data msg;
+            //std_msgs::Float32 result;
+            //sf11_altimeter::sensor_data msg;
             ser.read(response, ser.available());
             //std::cout << "Vector size: " << response.size() << "\n";
             double x;
@@ -94,13 +99,24 @@ int main (int argc, char** argv){
             }
             result.data = x;
             msg.altitude = x;
-            msg.header.stamp = ros::Time::now();
+            msg.unavailability = t_avail;
+            //msg.header.stamp = ros::Time::now();
             ROS_INFO_STREAM("Altitude[m]: " << result.data);
-            altitude.publish(msg);
-        }
+
+        }else{
+          ROS_ERROR_STREAM("Serial port unavailable" << t_avail);
+          t_avail += 1;
+          ser.close();
+          ser.open();
+          ser.flush();
+          msg.unavailability = t_avail;
+      }
+        msg.header.stamp = ros::Time::now();
+        altitude.publish(msg);
         response.clear(); //delete objects within vector
         std::vector<unsigned char>().swap(response); // Frees memory
-        //loop_rate.sleep();
+        ser.flush();
+        duration.sleep();
 
     }
     //ser.write(airspeed_off);

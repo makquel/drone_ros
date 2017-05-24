@@ -21,10 +21,13 @@ public:
   MavStatus();
   virtual void send();
   int getLoad();
+  int getBattery();
   uint32_t getSensorsPresent();
   uint32_t getSensorsEnabled();
   uint32_t getSensorsHealth();
-  mavlink_sys_status_t status; //SYS_STATUS ( #1 )
+  mavlink_sys_status_t status; // SYS_STATUS ( #74 )
+  mavlink_home_position_t home; // HOME_POSITION ( #242 )
+  mavlink_radio_status_t radio_status; // RADIO_STATUS ( #109 )
 
 private:
   //void voltageCallback(const yocto::voltage_info::ConstPtr& voltage);

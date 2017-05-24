@@ -30,7 +30,7 @@ private:
 
   //Inserir um parâmetro para visualizar a altura relativa (alt. laser) ou altura absoluta (alt. barométrico)
   //void gpsCallback(const sensor_msgs::NavSatFix::ConstPtr &gps);
-  void gpsCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure);
+  //void gpsCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure);
   void altCallback(const sf11_altimeter::sensor_data::ConstPtr& alt);
   //TODO
   void airspeedCallback(const droni_airspeed_driver::sensor_data::ConstPtr& gspeed);
@@ -43,7 +43,7 @@ private:
   ros::Subscriber alt_sub;
   ros::Subscriber airspeed_sub;
 
-  mavlink_vfr_hud_t vfr;
+  mavlink_vfr_hud_t vfr; //SYS_STATUS ( #74 )
 
   const double RAD_TO_DEG =180.0/3.1415;
   const double MILLIG_TO_MS2 = 9.80665 / 1000.0;

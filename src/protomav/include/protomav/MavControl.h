@@ -17,34 +17,34 @@ typedef enum CONTROL_STATE{
   WAIT_FOR_REQUEST=1,
   WAIT_FOR_WAYPOINT=2,
   WAIT_FOR_ACK=3
-  
+
 }CONTROL_STATE;
 
 namespace protomav{
-  
+
   class MavControl: public MavMessenger{
   public:
     MavControl();
     void mavCallback(const mavros_msgs::Mavlink::ConstPtr& mav);
     mavlink_message_t ros2mav(const mavros_msgs::Mavlink::ConstPtr& mav);
     void handleGetWaypointList();
-    
-    
+
+
     int getCount();
-    
+
     void process();
     bool handleMissionItem(int requested);
 //     void handleWPCommand();
     void handleWPRequest();
     void handleClearAll();
     void handleAck();
-    
+
     void sendWaypoint(Waypoint wp);
     void sendWPRequest(int sequence);
     void sendWPAck(MAV_RESULT type);
     void sendWPCount(int count);
     void send();
-    
+
   private:
     WPManagerClient * wpm;
     ros::Subscriber mav_sub;
@@ -55,8 +55,8 @@ namespace protomav{
     int requested;
     CONTROL_STATE state;
     std::vector<Waypoint> wp_vec;
-    ros::ServiceClient addWP_client;
+    //ros::ServiceClient addWP_client;
   };
-  
+
 }
 #endif

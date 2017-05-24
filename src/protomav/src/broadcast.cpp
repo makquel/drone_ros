@@ -5,14 +5,14 @@ MavBroadcast::MavBroadcast(){}
 void MavBroadcast::reached(int seq){
   mavlink_mission_item_reached_t reached;
   reached.seq= seq;
-  mavlink_msg_mission_item_reached_encode(SYSTEM_ID, COMP_ID, &out_msg, &reached);
+  mavlink_msg_mission_item_reached_encode(system_id, comp_id, &out_msg, &reached);
   send();
 }
 
 void MavBroadcast::current(int seq){
   mavlink_mission_current_t current;
   current.seq=seq;
-  mavlink_msg_mission_current_encode(SYSTEM_ID, COMP_ID, &out_msg, &current);
+  mavlink_msg_mission_current_encode(system_id, comp_id, &out_msg, &current);
   send();
 }
 

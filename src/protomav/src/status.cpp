@@ -59,6 +59,13 @@ int MavStatus::getLoad(){
 }
 
 /*
+ * TODO Implement Get
+ */
+int MavStatus::getBattery(){
+  return 7000;
+}
+
+/*
  * TODO Implement different getSensorsHealth
  */
 uint32_t MavStatus::getSensorsHealth(){
@@ -73,18 +80,29 @@ void MavStatus::send(){
   status.onboard_control_sensors_health = getSensorsHealth();
 
   //TODO Informações da Bateria
-  status.load = getLoad();//TODO
+  status.load = getLoad();// TODO: Get the aux voltage from blackbox
 
-  //status.voltage_battery = 18000;//onboard_battery*100/18.5;
-  //status.current_battery = -1;
-  //status.battery_remaining = -1;
+  status.voltage_battery = 7000;//onboard_battery*100/18.5;
+  //status.voltage_battery = getBattery();
+  status.current_battery = -1;
+  status.battery_remaining = -1;
 
   //TODO Comunication status
   status.drop_rate_comm = 0;
   status.errors_comm = 0;
 
+  //TODO Radio status
+  radio_status.rssi = 200;
+
+  /*home.latitude = 225106;
+  home.longitude = 470739;
+  home.altitude = 0;*/
+
+  //mavlink_msg_home_position_encode(system_id, comp_id, &mmsg, &home);
+  mavlink_msg_radio_status_encode(system_id, comp_id, &mmsg, &radio_status);
   mavlink_msg_sys_status_encode(system_id, comp_id, &mmsg, &status);
   MavMessenger::send(mmsg);
+  //ROS_INFO_THROTTLE(1,"SYS_STATUS: broadcasting");
 }
 
 //void MavStatus::voltageCallback(const yocto::voltage_info::ConstPtr& voltage){

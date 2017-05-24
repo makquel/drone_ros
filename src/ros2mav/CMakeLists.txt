@@ -121,7 +121,7 @@ include_directories(include ${catkin_INCLUDE_DIRS}
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ros2mav_node ros2mav_generate_messages_cpp)
 add_dependencies(gps2mav_node mtig_driver_msgs)
-add_dependencies(soc2mav_node yocto)
+#add_dependencies(soc2mav_node yocto)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(imu2mav_node
@@ -150,7 +150,7 @@ target_link_libraries(temp2mav_node
 
 target_link_libraries(soc2mav_node
    protomav
-	 yocto
+	 #yocto
    ${catkin_LIBRARIES}
 )
 
@@ -174,7 +174,7 @@ target_link_libraries(soc2mav_node
 # )
 
 # Mark executables and/or libraries for installation
-install(TARGETS imu2mav_node ros2vfr_node gps2mav_node ros2att_node temp2mav_node #soc2mav_node
+install(TARGETS imu2mav_node ros2vfr_node gps2mav_node ros2att_node temp2mav_node soc2mav_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

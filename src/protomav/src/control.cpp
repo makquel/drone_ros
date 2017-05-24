@@ -9,13 +9,13 @@ MavControl::MavControl(){
  nh.getParam("planner_frame", planner_frame);
  nh.getParam("gc_topic", mav_topic);
  mav_sub = nh.subscribe<mavros_msgs::Mavlink>(mav_topic, 10, &MavControl::mavCallback, this);
- 
+
  wpm = new WPManagerClient();
  wp_count=0;
  requested=-1;
  state=IDLE;
  ROS_INFO("STATE IDLE");
-  
+
 }
 
 void MavControl::send(){
@@ -49,7 +49,7 @@ mavlink_message_t MavControl::ros2mav(const mavros_msgs::Mavlink::ConstPtr& mav)
 
 void MavControl::sendWaypoint(Waypoint wp){
    mavlink_mission_item_t mwp;
-   
+
    ros::Duration duration = wp.getDuration();
    if(wp.isLocal()){
     geometry_msgs::PoseStamped pose = wp.getPose();
@@ -63,30 +63,30 @@ void MavControl::sendWaypoint(Waypoint wp){
     mwp.z=-pose.pose.position.z;
     mwp.param4 = tf::getYaw(pose.pose.orientation);
    }else{
-    mwp.frame = MAV_FRAME_GLOBAL;  
+    mwp.frame = MAV_FRAME_GLOBAL;
     geographic_msgs::GeoPose gp = wp.getGeoPose();
     mwp.x=gp.position.latitude;
     mwp.y=gp.position.longitude;
     mwp.z=gp.position.altitude;
     mwp.param4 = tf::getYaw(gp.orientation);
    }
-   
+
    mwp.param1 = (uint64_t)duration.sec*1000+(uint64_t)duration.nsec/1.0e6;
    mwp.param2 = 1.0;
    mwp.param3 = 0.0;
-   
+
    mwp.command=MAV_CMD_NAV_WAYPOINT;
    mwp.target_system=in_mmsg.sysid;
    mwp.target_component=in_mmsg.compid;
-   
+
    mwp.autocontinue = 1;
    mwp.current=0;
    mwp.seq=wp.getId();
-   
-   
-   if(wpm->getListSize()==1) mwp.current=1; 
-   
-   
+
+
+   if(wpm->getListSize()==1) mwp.current=1;
+
+
    mavlink_msg_mission_item_encode(SYSTEM_ID, MAV_COMP_ID_MISSIONPLANNER, &out_mmsg, &mwp);
    ROS_INFO("Sending Waypoint %d", mwp.seq	);
    send();
@@ -99,7 +99,7 @@ void MavControl::sendWPCount(int count){
   mav_count.target_system=in_mmsg.sysid;
   mavlink_msg_mission_count_encode(SYSTEM_ID, COMP_ID, &out_mmsg, &mav_count);
   send();
-  
+
 }
 void MavControl::handleGetWaypointList(){
   ROS_INFO_STREAM("Handle Get Waypoint List");
@@ -107,7 +107,7 @@ void MavControl::handleGetWaypointList(){
   sendWPCount(wpm->getListSize());
   state=WAIT_FOR_REQUEST;
   ROS_INFO("STATE WAIT FOR REQUEST");
-  
+
 }
 
 int MavControl::getCount(){
@@ -131,14 +131,14 @@ void MavControl::sendWPAck(MAV_RESULT type){
   ack.target_component=in_mmsg.compid;
   ack.target_system=in_mmsg.sysid;
   ack.type=type;
-  mavlink_msg_mission_ack_encode(SYSTEM_ID, COMP_ID, &out_mmsg, &ack);  
+  mavlink_msg_mission_ack_encode(SYSTEM_ID, COMP_ID, &out_mmsg, &ack);
   ROS_INFO("Sending Waypoint ACK");
   send();
 }
 
 void MavControl::handleClearAll(){
   if(state!=IDLE) {
-   ROS_ERROR("Trying to do a CLEAR cmd in the middle of a transaction. Denied"); 
+   ROS_ERROR("Trying to do a CLEAR cmd in the middle of a transaction. Denied");
    return;
   }
   wpm->clear();
@@ -158,23 +158,23 @@ void MavControl::handleAck(){
 }
 
 void MavControl::process( ){
-  
+
   switch(in_mmsg.msgid){
-    
-    //Ground Station request current WP list in the robotic vehicle. 
+
+    //Ground Station request current WP list in the robotic vehicle.
     //Initiates Read WP protocol. Vehicle sends back the WP count and enters WAIT_FOR_REQUEST mode;
     case MAVLINK_MSG_ID_MISSION_REQUEST_LIST:
       handleGetWaypointList();
     break;
-    
+
     case MAVLINK_MSG_ID_MISSION_REQUEST:
       handleWPRequest();
     break;
-    
+
     case MAVLINK_MSG_ID_MISSION_CLEAR_ALL:
       handleClearAll();
     break;
-   
+
     //GCS sends WP count. Begins WP transmission protocol
     case MAVLINK_MSG_ID_MISSION_COUNT:
       wp_count = getCount();
@@ -182,11 +182,11 @@ void MavControl::process( ){
       requested=0;
       sendWPRequest(requested);
     break;
-    
+
     case MAVLINK_MSG_ID_MISSION_ACK:
       handleAck();
     break;
-    
+
     case MAVLINK_MSG_ID_MISSION_ITEM:
       if(requested<0){
 	ROS_WARN("Not Expecting Any Mission Item, skippping...");
@@ -203,24 +203,24 @@ void MavControl::process( ){
 	  requested=-1; wp_count=0; sendWPAck(MAV_RESULT_ACCEPTED);} // end of wp list, send ACK
       }
       else { sendWPAck(MAV_RESULT_FAILED); }
-    
+
     break;
-      
-    
+
+
   }
-  
-  
-  
+
+
+
 }
 /** GCS Requests Waypoints currently on the Vehicle
- */ 
+ */
 void MavControl::handleWPRequest(){
   //Must have been put in this state by a previous GET COUNT request
   if(state!=WAIT_FOR_REQUEST) {
     ROS_WARN("Received Request for Waypoint outside of an transaction. Ignoring...");
     return;
   }
-  
+
   mavlink_mission_request_t req;
   mavlink_msg_mission_request_decode(&in_mmsg, &req);
   int requested=req.seq;
@@ -238,74 +238,85 @@ void MavControl::handleWPRequest(){
 }
 
 bool MavControl::handleMissionItem(int requested){
- mavlink_mission_item_t item;
+ mavlink_mission_item_t item; // MISSION_ITEM ( #39 ) depends of MAV_CMD
  mavlink_msg_mission_item_decode(&in_mmsg, &item);
- 
- 
+
+
  if(item.seq != requested) return false;
  ROS_WARN("Command = %d", item.command);
  switch(item.command){
+   case(MAV_CMD_NAV_TAKEOFF):
+    ROS_WARN("Take-off handle not implemented");
+    //TODO
+   break;
+
+   case(MAV_CMD_NAV_LAND):
+    ROS_WARN("Land handle not implemented");
+    //TODO
+   break;
+
    case(MAV_CMD_NAV_WAYPOINT):
      Waypoint *wp;
-     ROS_WARN("Frame =%d", item.frame);
-     if(item.frame==MAV_FRAME_GLOBAL){
-      geographic_msgs::GeoPose gp;
-      
+     ROS_WARN("Frame = %d", item.frame); // MAV_FRAME
+     if(item.frame == MAV_FRAME_GLOBAL){
+       ROS_INFO("MAV_FRAME_GLOBAL selected");
+       geographic_msgs::GeoPose gp;
+
       //GPS Position
       gp.position.latitude = item.x;
       gp.position.longitude = item.y;
       gp.position.altitude = item.z;
-      
+
       //Orientation
       tf::Quaternion q;
       q.setRPY(0.0, 0.0, item.param4); //param4 = yaw
       tf::quaternionTFToMsg(q, gp.orientation);
       ROS_INFO("quaternion W: %f", gp.orientation.w);
-      
+
       wp = new Waypoint(gp, item.seq);
       ROS_INFO("--WP w : %f", wp->getPose().pose.orientation.w);
     }else if(item.frame==MAV_FRAME_LOCAL_NED){
       ROS_WARN("Local Waypoint");
-      wp= new Waypoint(item.y, item.x, -item.z, item.param4, "map", item.seq);  
+      wp= new Waypoint(item.y, item.x, -item.z, item.param4, "map", item.seq);
     }else if(item.frame==MAV_FRAME_LOCAL_ENU){
       ROS_WARN("Local Waypoint");
-      wp= new Waypoint(item.x, item.y, item.z, item.param4, "map", item.seq);  
+      wp= new Waypoint(item.x, item.y, item.z, item.param4, "map", item.seq);
     }
     else{
-     return false; 
+     return false;
     }
     wp->setDuration(item.param1);
     ROS_INFO("WP w: %f", wp->getPose().pose.orientation.w);
     wpm->push(*wp);
     break;
-   
+
    default:
-    break; 
+    break;
   }
   return true;
 }
 // void MavControl::handleWPCommand(){
-//   
+//
 //  ROS_INFO("Received Waypoint Command");
 //  mavlink_command_int_t command;
 //  mavlink_msg_command_int_decode(&in_mmsg, &command);
-//      
-//      
+//
+//
 //  switch(command.command){
 //    case(MAV_CMD_NAV_WAYPOINT):
-// 	 
+//
 //     if(command.frame==MAV_FRAME_GLOBAL){
 //       geographic_msgs::GeoPoint gp;
 //       geodesy::UTMPoint utm;
 //       gp.latitude = command.x/10e7;
 //       gp.longitude = command.y/10e7;
 //       gp.altitude = command.z;
-// 	    
+//
 //       //geodesy::fromMsg(gp, utm);
 //       Waypoint wp(gp, wp_id++);
 //       wp.setDuration(command.param1);
 //       wpm->push(wp);
-//     
+//
 //     }
 //     if(command.frame==MAV_FRAME_LOCAL_ENU){
 //       Waypoint wp(command.x/10e4, command.y/10e4, command.z/10e4, command.param4, "map", wp_id++);
@@ -313,16 +324,16 @@ bool MavControl::handleMissionItem(int requested){
 //       wpm->push(wp);
 //     }
 //    break;
-//    default:  
+//    default:
 //    break;
 //  }
-//      
-//       
+//
+//
 // }
 int main(int argc, char ** argv){
  ros::init(argc, argv, "control");
  MavControl mc;
- 
+
  ros::spin();
- return 1; 
+ return 1;
 }

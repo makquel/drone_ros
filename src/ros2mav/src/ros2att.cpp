@@ -42,10 +42,10 @@ void Ros2Att::imuCallback(const sensor_msgs::Imu::ConstPtr& imu){
 
 void Ros2Att::rpyCallback(const geometry_msgs::Vector3Stamped::ConstPtr& rpy){
 
-    //XSENS (ENU) TO MAV(NED)
-    att.roll=rpy->vector.x/RAD_TO_DEG;			// 1/RAD_TO_DEG = DEG_TO_RAD
-    att.pitch=-rpy->vector.y/RAD_TO_DEG;
-    att.yaw=(90.0-rpy->vector.z)/RAD_TO_DEG;		//Heading adjustment from XSENS
+    //
+    att.roll = (180-rpy->vector.x)/RAD_TO_DEG;			// 1/RAD_TO_DEG = DEG_TO_RAD
+    att.pitch = -rpy->vector.y/RAD_TO_DEG;
+    att.yaw = -(90.0-rpy->vector.z)/RAD_TO_DEG;		//Heading adjustment from XSENS
     if(!sync) send();
 }
 

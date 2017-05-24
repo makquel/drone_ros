@@ -1,5 +1,3 @@
 <launch>
-
-  
   <node type="status" pkg="protomav"  name="status_node"/>
 </launch>

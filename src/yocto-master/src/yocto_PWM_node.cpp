@@ -62,8 +62,9 @@ int main(int argc, char **argv)
      */
     ros::Publisher pub1 = n.advertise<yocto::PWM_info>("/yocto/pwm_info", 1000); //avisa que irá publicar no tópico /yocto/pwm_info
     ros::Publisher pub2 = n.advertise<yocto::voltage_info>("/yocto/voltage_info", 1000);
+    float sampling_rate = 50.0; //Hz
+    ros::Duration duration(1./sampling_rate); ///1/Ts
 
-    ros::Rate loop_rate(10);
 
     string       errmsg;
     string       target1 = "YPWMRX01-37171"; //
@@ -133,6 +134,7 @@ int main(int argc, char **argv)
         m = pwm->get_module();
         pwm3 = YPwmInput::FindPwmInput(m->get_serialNumber() + ".pwmInput1");
         pwm4 = YPwmInput::FindPwmInput(m->get_serialNumber() + ".pwmInput2");
+        pwm_b_available = true;
     } else {
       ROS_WARN("No YOCTO PWM B module connected, please check module connection");
       pwm_b_available = false;
@@ -225,6 +227,7 @@ int main(int argc, char **argv)
 
 
     while (ros::ok()){
+      //mtr1.duty_cycle_1    = pwm1->get_dutyCycle();
       if (pwm_a_available == true) {
         mtr1.frequency_1     = pwm1->get_frequency();
         mtr1.duty_cycle_1    = pwm1->get_dutyCycle();
@@ -278,7 +281,8 @@ int main(int argc, char **argv)
       pub1.publish(mtr1);
       pub2.publish(mtr2);
       ros::spinOnce();
-      loop_rate.sleep();
+      duration.sleep();
+
     }
 
     return 0;

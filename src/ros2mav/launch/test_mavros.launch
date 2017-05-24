@@ -3,15 +3,7 @@
   <include file="$(find protomav)/launch/protomav.launch" />
   <include file="$(find ros2mav)/launch/image2mav.launch" />
   <!--include file="$(find ros2mav)/launch/image2mav_copy.launch" /-->
-
-  <include file="$(find mtig_driver)/launch/mtig_driver.launch" />
-  <include file="$(find ros_pololu_servo)/launch/pololu_example.launch" />
-  <include file="$(find yocto)/launch/yocto_master.launch" />
-  <include file="$(find droni_airspeed_driver)/launch/airspeed_node.launch" />
-  <include file="$(find sf11_altimeter)/launch/sf11c_node.launch" />
-
-  <!--include file="$(find protomav)/launch/mavros.launch" /-->
-<!--   <node pkg="mavros" type="gcs_bridge" name="mavlink_bridge">
-		<param name="gcs_url" value="udp://localhost:14554@localhost:14553" />
-  </node> -->
+  
+  <!--include file="$(find diagnostics_stack)/launch/test_stack.launch" /-->
+  
 </launch>

@@ -9,7 +9,7 @@ WPManager::WPManager(std::string wp_frame, std::string planner_frame):wp_frame_(
   WPclear=nh.advertiseService("clear_wp_list", &WPManager::clearService, this);
   WPcompleted=nh.advertiseService("set_list_completed", &WPManager::setListCompletedService, this);
   mb_client = new MoveBaseClient("move_base",false);
-  
+
 }
 
 int WPManager::getListSize(){
@@ -22,25 +22,26 @@ std::vector<Waypoint> WPManager::getWaypointList(){
 }
 
 bool WPManager::WPtoMsg(Waypoint & wp, protomav::WaypointMsg & wp_msg){
- wp_msg.pose=wp.getPose();
- wp_msg.loiter=wp.getDuration();
- wp_msg.id=wp.getId();
+  //TODO Fill up with all the required paramters
+  wp_msg.pose = wp.getPose();
+  wp_msg.loiter = wp.getDuration();
+  wp_msg.id = wp.getId();
 }
 
 bool WPManager::getWPVectorService(protomav::GetWPVector::Request &req, protomav::GetWPVector::Response &res){
     std::vector<Waypoint> wp_vector = getWaypointList();
     std::vector<protomav::WaypointMsg> wp_msg_vector;
-    
-    for (std::vector<Waypoint>::iterator it = wp_vector.begin() ; it != wp_vector.end(); ++it){ 
+
+    for (std::vector<Waypoint>::iterator it = wp_vector.begin() ; it != wp_vector.end(); ++it){
       protomav::WaypointMsg wp_msg;
       WPtoMsg(*it, wp_msg);
       wp_msg_vector.push_back(wp_msg);
     }
     res.wp_vector=wp_msg_vector;
     return true;
-  
+
 }
- 
+
 bool WPManager::pushService(AddWaypoint::Request &req,
 			    AddWaypoint::Response & res){
     ROS_INFO("Service Called");
@@ -51,18 +52,18 @@ bool WPManager::pushService(AddWaypoint::Request &req,
 bool WPManager::push(Waypoint wp){
   std::pair<std::set<int>::iterator,bool> ret;
   ret = id_set.insert(wp.getId());
-  
+
   if(ret.second==false) {
     ROS_INFO("Waypoint ID already in set, not inserting");
     return false;
   }
-  wp_list_temp.push_back(wp); 
+  wp_list_temp.push_back(wp);
   ROS_INFO("Waypoint added to the waypoint list");
   return true;
 }
 
 bool WPManager::getListSizeService(protomav::GetWPListSize::Request &req, protomav::GetWPListSize::Response &res){
- res.size=getListSize(); 
+ res.size=getListSize();
  return true;
 }
 
@@ -116,23 +117,23 @@ void WPManager::run(){
   else{
     /* TODO*/
   }
-  
+
   try{
    listener.transformPose(planner_frame_, wp_pose, goal_pose);
   }
   catch(tf::TransformException ex){
    ROS_ERROR("%s", ex.what());
    continue;
-  }  
-  
-  
+  }
+
+
   goal.target_pose=goal_pose;
   goal.target_pose.pose.position.z=0.0;
   broadcast.current(current);
   mb_client->sendGoal(goal);
-  
+
   while(!mb_client->waitForResult(ros::Duration(0.2))){ros::spinOnce();}
-  
+
   if(mb_client->getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
     ROS_INFO("Waypoint reached");
     broadcast.reached(current);
@@ -141,7 +142,7 @@ void WPManager::run(){
     ROS_INFO("The robot/vehicle wasn't able to reach the waypoint. Going for the next one");
     continue;
   }
- 
+
   ros::Rate r(10.0);
   ros::Time start = ros::Time::now();
   while(ros::ok()){
@@ -165,5 +166,5 @@ main(int argc, char**argv){
   wpm.run();
   ros::spinOnce();
  }
- return 0; 
+ return 0;
 }

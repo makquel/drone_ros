@@ -17,7 +17,7 @@ Ros2Vfr::Ros2Vfr(){
   vel_sub = nh.subscribe<geometry_msgs::TwistWithCovarianceStamped>(vel_topic, 10, &Ros2Vfr::velCallback, this);
   imu_sub = nh.subscribe<sensor_msgs::Imu>(imu_topic, 10, &Ros2Vfr::imuCallback, this);
   //gps_sub = nh.subscribe<sensor_msgs::NavSatFix>(gps_topic, 10, &Ros2Vfr::gpsCallback, this);
-  gps_sub = nh.subscribe<sensor_msgs::FluidPressure>(pressure_topic, 10, &Ros2Vfr::gpsCallback, this);
+  //gps_sub = nh.subscribe<sensor_msgs::FluidPressure>(pressure_topic, 10, &Ros2Vfr::gpsCallback, this);
   alt_sub = nh.subscribe<sf11_altimeter::sensor_data>(altitude_topic, 10, &Ros2Vfr::altCallback, this);
   airspeed_sub = nh.subscribe<droni_airspeed_driver::sensor_data>(airspeed_topic, 10, &Ros2Vfr::airspeedCallback, this);
 }
@@ -55,26 +55,26 @@ void Ros2Vfr::imuCallback(const sensor_msgs::Imu::ConstPtr& imu){
 }
 
 void Ros2Vfr::velCallback(const geometry_msgs::TwistWithCovarianceStamped::ConstPtr& vel){
-  /*vfr.groundspeed=vfr.airspeed=sqrt(vel->twist.twist.linear.z*vel->twist.twist.linear.z
+  vfr.groundspeed = sqrt(vel->twist.twist.linear.z*vel->twist.twist.linear.z
 			       +vel->twist.twist.linear.y*vel->twist.twist.linear.y
 			       +vel->twist.twist.linear.x*vel->twist.twist.linear.x);
-
-  vfr.climb=vel->twist.twist.linear.z;*/
-  vfr.groundspeed = 1.5;
-  vfr.climb = 0.2;
-  if(!sync) send();
+  //vfr.groundspeed = 1.5;
+  vfr.climb = vel->twist.twist.linear.z;;
+  if(!sync){
+    send();
+  }
 }
 
-void Ros2Vfr::gpsCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure){
-  /*float cte = 145366.45;
+/*void Ros2Vfr::gpsCallback(const sensor_msgs::FluidPressure::ConstPtr& pressure){
+  float cte = 145366.45;
   float expo = 0.190284;
   vfr.alt = 0.75;
   //vfr.alt = pow((1-(pressure->fluid_pressure/1013.25)),expo)*cte;
 
   if(!sync){
     send();
-  }*/
-}
+  }
+}*/
 
 void Ros2Vfr::altCallback(const sf11_altimeter::sensor_data::ConstPtr& alt){
   vfr.alt = alt->altitude; //m
@@ -85,8 +85,8 @@ void Ros2Vfr::altCallback(const sf11_altimeter::sensor_data::ConstPtr& alt){
 }
 
 void Ros2Vfr::airspeedCallback(const droni_airspeed_driver::sensor_data::ConstPtr& airspeed){
-  //vfr.airspeed = airspeed->airspeed;
-  vfr.airspeed = 1.0; //m/s
+  vfr.airspeed = airspeed->airspeed;//m/s
+  //vfr.airspeed = 8.0; //m/s
   if(!sync){
     send();
   }

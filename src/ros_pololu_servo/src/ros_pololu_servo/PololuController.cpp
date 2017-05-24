@@ -71,7 +71,7 @@ bool PololuController::initialize()
         success = false;
     }
 
-    nh.param<string>("port_name", port_name, "/dev/ttyACM0");
+    nh.param<string>("port_name", port_name, "/dev/sensors/pololu_maestro"); ///dev/ttyACM0
     nh.param<int>("baud_rate", baud_rate, 115200);
     nh.param<int>("rate_hz", rate_hz, 10);
     nh.param<bool>("daisy_chain", daisy_chain, false);
@@ -260,7 +260,7 @@ void PololuController::digital_command_callback(const DigitalCommand::ConstPtr& 
         ROS_INFO("Recevied command to read digital inputs");
         publish_digital_state();
     }
-    
+
 
 }
 void PololuController::publish_digital_state()
@@ -289,7 +289,7 @@ void PololuController::publish_digital_state()
     digital_state.garateia  =   garateia;
     digital_state.comutador =   comutador;
 
-    
+
     digital_state_pub.publish(digital_state);
 
 }

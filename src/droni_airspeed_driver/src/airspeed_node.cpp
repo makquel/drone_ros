@@ -44,32 +44,29 @@ int main (int argc, char** argv){
     ros::NodeHandle nh;
     float conv_factor = 500/pow(2,15);
     int rho = 1.225;// kg/m^3
+    std::vector<unsigned char> response; //serial object input buffer allocated for xbee response
+    std_msgs::Float32 result;
+    int16_t t_occ = 0;// occurrence
+    int16_t t_avail = 0;// serial port unavailability
 
-    //ros::Subscriber write_sub = nh.subscribe("write", 1000, write_callback);
-    ros::Publisher airspeed = nh.advertise<droni_airspeed_driver::sensor_data>("airspeed_msg", 5);
-
+    ros::Publisher airspeed = nh.advertise<droni_airspeed_driver::sensor_data>("airspeed_msg", 100);
     //setting default device path for the sensor
     //nh.param("serial_port", serial_port, std::string("/dev/ttyUSB0")); //TODO: Assing a name to specific device
     nh.param("serial_port", serial_port, std::string("/dev/sensors/d_airspeed")); //TODO: Assing a name to specific device
     //setting default device communication speed for the sensor
     nh.param("serial_speed", serial_speed, int(115200));
     // setting default sampling rate
-    nh.param("sampling_rate", sampling_rate, int(16));
-
-    unsigned char xml_parser_on[] = { 0x7E, 0x00, 0x10, 0x17, 0x01, 0x00, 0x7D, 0x33, 0xA2, 0x00, 0x40, 0x30, 0xEF, 0xE8, 0xFF, 0xFE, 0x02, 0x44, 0x31, 0x05, 0x72 };
-    std::vector<unsigned char> airspeed_on(xml_parser_on, xml_parser_on+21);
-
-    unsigned char xml_parser_off[] = { 0x7E, 0x00, 0x10, 0x17, 0x01, 0x00, 0x7D, 0x33, 0xA2, 0x00, 0x40, 0x30, 0xEF, 0xE8, 0xFF, 0xFE, 0x02, 0x44, 0x31, 0x04, 0x73 };
-    std::vector<unsigned char> airspeed_off(xml_parser_off, xml_parser_off+21);
+    nh.param("sampling_rate", sampling_rate, int(20));
 
     unsigned char xml_parser_request[] = { 0x7E, 0x00, 0x10, 0x10, 0x01, 0x00, 0x7D, 0x33, 0xA2, 0x00, 0x40, 0xF9, 0x8F, 0x55, 0xFF, 0xFE, 0x00, 0x00, 0x52, 0x44, 0x89 };
     std::vector<unsigned char> airspeed_request(xml_parser_request, xml_parser_request+21);
+    ros::Duration duration(1./float(sampling_rate));
 
     try
     {
         ser.setPort(serial_port);
         ser.setBaudrate(serial_speed);
-        serial::Timeout to = serial::Timeout::simpleTimeout(1000);
+        serial::Timeout to = serial::Timeout::simpleTimeout(10);
         ser.setTimeout(to);
         ser.open();
         ser.setRTS(true);
@@ -84,86 +81,80 @@ int main (int argc, char** argv){
 
     if(ser.isOpen()){
         ROS_INFO_STREAM("Serial Port initialized");
-        //ser.write(airspeed_on);
+        duration.sleep(); //Xbee timer after power*up
     }else{
         return -1;
     }
 
-    ros::Rate loop_rate(20); // 20Hz
-    ros::Duration duration(1./float(sampling_rate)); //1/20Hz
-
-
-    std::vector<unsigned char> hexstring;
-    hexstring.push_back(0x7E);
-    hexstring.push_back(0x00);
-    hexstring.push_back(0x0F);
-    hexstring.push_back(0x17);
-    hexstring.push_back(0x01);
-    hexstring.push_back(0x00);
-    hexstring.push_back(0x7D);
-    hexstring.push_back(0x33);
-    hexstring.push_back(0xA2);
-    hexstring.push_back(0x00);
-    hexstring.push_back(0x40);
-    hexstring.push_back(0x30);
-    hexstring.push_back(0xEF);
-    hexstring.push_back(0xE8);
-    hexstring.push_back(0xFF);
-    hexstring.push_back(0xFE);
-    hexstring.push_back(0x02);
-    hexstring.push_back(0x49);
-    hexstring.push_back(0x53);
-    hexstring.push_back(0x50);
-
-    std::vector<unsigned char> response;
-    duration.sleep(); //Xbee timer after power*up
-
     while(ros::ok()){
+      std_msgs::Float32 result;
+      droni_airspeed_driver::sensor_data msg;
       int16_t x = 0;
-        ros::spinOnce();
+      ros::spinOnce();
 
-        //ser.write(hexstring);
-        ser.write(airspeed_request);
-        //ROS_INFO_STREAM("Requesting measurement");
-        duration.sleep();
-
-        //std::cout << "CTS:" << ser.getCTS() << "\n";
-        //std::cout << "Buffer size: " << ser.available() << "\n";
-        if(ser.available()){
-            //ROS_INFO_STREAM("Reading from serial port");
-            std_msgs::Float32 result;
-            droni_airspeed_driver::sensor_data msg;
-            ser.read(response, ser.available());
-            //std::cout << "Vector size: " << int(response.size()) << "\n";
-            if (int(response.size()) == 30){ //Size of Transmit Status + Receive Packet
-              //for(int i=0; i<response.size(); ++i)
-              //    std::cout << hex(response[i]) << std::endl;
-              if(int((response[8])) == 0){
-                //--ROS_INFO_STREAM("ok");
-                x = ((response[27])*256 + (response[28])*1);
-                //if(){}
-                //std::cout << "AirSpeed_ping: [" << x << "]\n";
-              }
-
-              result.data = x;
-              result.data *= conv_factor; //Pa
-              result.data = sqrt(2*abs(result.data)/rho);
-              if(x < 0){
-                msg.airspeed = -1*result.data;
-              }else{
-                msg.airspeed = result.data;
-              }
-              ROS_INFO_STREAM("Airspeed[bitwise]: " << result.data );
-              msg.header.stamp = ros::Time::now();
-
-              airspeed.publish(msg);
-
-            }
+      ser.write(airspeed_request);
+      //ROS_INFO_STREAM("Requesting measurement");
+      //std::cout << "CTS:" << ser.getCTS() << "\n";
+      //std::cout << "Buffer size: " << ser.available() << "\n";
+      if(ser.available()){
+        //ROS_INFO_STREAM("Reading from serial port");
+        ser.read(response, ser.available());
+        //std::cout << "Vector size: " << int(response.size()) << "\n";
+        if (int(response.size()) == 31){ //Size of Transmit Status + Receive Packet
+          //for(int i=0; i<response.size(); ++i)
+          //    std::cout << hex(response[i]) << std::endl;
+          if(int((response[8])) == 0){
+            //--ROS_INFO_STREAM("ok");
+            x = ((response[28])*256 + (response[29])*1);
+            //if(){}
+            //std::cout << "AirSpeed_ping: [" << x << "]\n";
+          }
+          result.data = x;
+          msg.digi_val = result.data;
+          result.data *= conv_factor; //Pa
+          result.data = sqrt(2*abs(result.data)/rho);
+          if(x < 0){
+            msg.airspeed = -1*result.data;
+          }else{
+            msg.airspeed = result.data;
+          }
+          //msg.airspeed = result.data;
+          msg.casualties = t_occ;
+          msg.unavailability = t_avail;
+          ROS_INFO_STREAM("Airspeed[bitwise]: " << x );
+          //msg.header.stamp = ros::Time::now();
+          //airspeed.publish(msg);
+        }else{
+          //TODO: Implementar um filtro preditivo caso não haja uma medição
+          t_occ += 1;
+          //WARNING : Gambiarra!!
+          ser.flush();
+          if(ser.isOpen()){
+            ROS_WARN_STREAM("Serial port soft reset:" << t_occ);
+          }
+          msg.casualties = t_occ;
+          if(x < 0){
+            msg.airspeed = -1*result.data;
+          }else{
+            msg.airspeed = result.data;
+          }
+          //msg.airspeed = result.data;
+          msg.digi_val = result.data;
         }
-        response.clear(); //delete objects within vector
-        std::vector<unsigned char>().swap(response); // Frees memory
-        //loop_rate.sleep();
-
+      }else{
+          ROS_ERROR_STREAM("Serial port unavailable:" << t_avail);
+          t_avail += 1;
+          ser.close();
+          ser.open();
+          ser.flush();
+          msg.unavailability = t_avail;
+      }
+      msg.header.stamp = ros::Time::now();
+      airspeed.publish(msg);
+      response.clear(); //delete objects within vector
+      std::vector<unsigned char>().swap(response); // Frees memory
+      ser.flush();
+      duration.sleep();
     }
-    ser.write(airspeed_off);
+    ser.close();
 }

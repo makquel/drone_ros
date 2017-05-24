@@ -12,18 +12,18 @@ public:
 //  mavlink_scaled_imu_t* getMavlinkImuPtr();
  // mavlink_message_t* getMavlinkMsgPtr();
   void send();
-  
+
 private:
   void rpyCallback(const geometry_msgs::Vector3Stamped::ConstPtr& rpy);
   void imuCallback(const sensor_msgs::Imu::ConstPtr& imu);
-  
-  
+
+
   //SUBSCRIBERS
   ros::Subscriber imu_sub;
   ros::Subscriber rpy_sub;
-    
+
   //MAVLINK DATA TYPE
-  mavlink_attitude_t att;
+  mavlink_attitude_t att; //ATTITUDE #30
 
   //CONST FOR UNIT CONVERSION
   const double RAD_TO_DEG =180.0/3.1415;

@@ -12,8 +12,8 @@
 using namespace geometry_msgs;
 class Waypoint{
 public:
-  Waypoint(PoseStamped  pose, ros::Duration duration, int id);
-  Waypoint(PoseStamped  pose, int id);
+  Waypoint(geometry_msgs::PoseStamped  pose, ros::Duration duration, int id);
+  Waypoint(geometry_msgs::PoseStamped  pose, int id);
   Waypoint(double x , double y, double z, double th, std::string frame, int id);
   Waypoint(double x, double y, double z, std::string frame, int id);
   Waypoint(geographic_msgs::GeoPose gp, int id);
@@ -21,19 +21,27 @@ public:
   void setFrame(std::string str);
   PoseStamped getPose();
   ros::Duration getDuration();
-  void setDuration(double d);
+  void setDuration(double d); // if d > epsilon: hovering mode = true
+  void setPathType(int trayectory); // Trayectory type [linear:0 quadratic:1 splines:2]
+  void setNeighborhood(float nhood);
+  void setSpeed(float speed);
+  
   int getId();
   bool isLocal();
   geographic_msgs::GeoPose getGeoPose();
   void init(double x, double y, double z, double th, std::string frame, int id);
 private:
-  geographic_msgs::GeoPose gp_;
-  PoseStamped pose_;
-  ros::Duration duration_;
-  bool local_frame_;
-  int id_;//loitering time
+  geographic_msgs::GeoPose gp_; //
+  geometry_msgs::PoseStamped pose_; //
+  ros::Duration duration_; // Hold (loiter phase) time  in decimal seconds.
+  bool local_frame_; // MAV_FRAME???
+  int id_; // WP ID givem by vector position
+  // TODO: add to Construtor
+  int interpolation_; // Trayectory type [linear:0 quadratic:1 splines:2]
+  float speed_; // Scalar quantity of velocity vector over the WP_i
+  float neighborhood; // Acceptance radius in meters
 
-  
+
 };
 
 
@@ -46,6 +54,7 @@ Waypoint::Waypoint(const Waypoint & wp){
  this->duration_=wp.duration_;
  this->id_=wp.id_;
  this->gp_=wp.gp_;
+ this->interpolation_ = wp.interpolation_;
  this->local_frame_=wp.local_frame_;
 }
 
@@ -53,21 +62,21 @@ void Waypoint::init(double x, double y, double z, double th, std::string frame, 
   //PoseStamped * p = new PoseStamped();
  pose_.header.frame_id=frame;
  pose_.header.stamp = ros::Time::now();
- 
+
  pose_.pose.position.x=x;
  pose_.pose.position.y=y;
  pose_.pose.position.z=z;
  tf::Quaternion q= tf::createQuaternionFromYaw(th);
- 
+
  ROS_WARN("Setou posicao");
  //Double-check to see if it works
  tf::quaternionTFToMsg(q, pose_.pose.orientation);
- 
- 
+
+
  ROS_INFO("Pose: %f", getPose().pose.orientation.w);
  ROS_WARN("Setou pose");
  duration_=ros::Duration(0.0);
- id_=id; 
+ id_=id;
 }
 
 Waypoint::Waypoint(PoseStamped pose,  ros::Duration duration, int id):pose_(pose), duration_(duration), id_(id), local_frame_(true){}
@@ -89,16 +98,16 @@ Waypoint::Waypoint(geographic_msgs::GeoPose gp, int id):gp_(gp), id_(id),local_f
   geodesy::UTMPoint utm;
   geographic_msgs::GeoPoint gpoint=gp.position;
   geodesy::fromMsg(gpoint, utm);
-  
+
   std::string waypoint_frame;
   ros::param::param<std::string>("waypoint_frame", waypoint_frame, "map");
   ROS_INFO("Criando Waypoint baseado em GPS");
-  
+
   init(utm.easting, utm.northing, utm.altitude,0.0, waypoint_frame, id);
 }
 
 void Waypoint::setFrame(std::string frame){
- pose_.header.frame_id=frame; 
+ pose_.header.frame_id=frame;
 }
 
 PoseStamped Waypoint::getPose(){
@@ -106,17 +115,21 @@ PoseStamped Waypoint::getPose(){
 }
 
 ros::Duration Waypoint::getDuration(){
- return duration_; 
+ return duration_;
 }
-  
+
 void Waypoint::setDuration(double d){
- duration_=ros::Duration(d); 
+ duration_ = ros::Duration(d);
+}
+
+void Waypoint::setPathType(int trayectory){
+  interpolation_ = trayectory;
 }
 int Waypoint::getId(){
   return id_;
 }
 geographic_msgs::GeoPose Waypoint::getGeoPose(){
- return gp_; 
+ return gp_;
 }
 
 bool Waypoint::isLocal(){

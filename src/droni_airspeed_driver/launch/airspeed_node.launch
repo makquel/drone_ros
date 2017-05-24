@@ -1,6 +1,6 @@
 <launch>
 	<!--param name="device" type="str" value="/dev/ttylightware_altitude" /-->
-	<node pkg="droni_airspeed_driver" name="airspeed_sensor" type="airspeed_node">
+	<node pkg="droni_airspeed_driver" name="airspeed_sensor" type="airspeed_node" output="screen"> <!--output="screen"-->
     	<param name="serial_port" type="string" value="/dev/sensors/d_airspeed" />
 			<!--param name="serial_port" type="string" value="/dev/ttyUSB0"/-->
     	<param name="serial_speed" type="int" value="115200" />

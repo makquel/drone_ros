@@ -10,7 +10,5 @@ namespace protomav{
     std::vector<Waypoint> getWaypointVector();
     bool clear();
     bool setListCompleted();
-
-    
   };
 }

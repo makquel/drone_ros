@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include <yocto/PWM_info.h>
 #include <ros_pololu_servo/DigitalState.h>
@@ -30,22 +31,84 @@ int main(int argc, char **argv)
     ros::Subscriber sub_digital = nh.subscribe("/pololu/digital_state", 100, digital_received_callback);
     ros::Subscriber sub_yocto = nh.subscribe("/yocto/pwm_info", 100, RX_received_callback);
 
-    float sampling_rate = 64.0; //Hz
+    float sampling_rate = 50.0; //Hz
     ros::Duration duration(1./sampling_rate); ///1/Ts
 
 
     ros_pololu_servo::MotorCommand mtr;     //objeto da mensagem que será publicada
     ROS_INFO_THROTTLE(1,"Running diagnostic's node");
+    float vet_degree = 0.0;
+    float vet_step = M_PI/100;
+    float vet_T = 0.0;
+
+    float prop_gauge = 0.0;
+    float prop_step = M_PI/100;
+    float prop_T = 0.0;
     while (ros::ok()){
       if(commutator == true){
-        ROS_INFO_THROTTLE(1,"autopilot mode : ON");
+        ROS_WARN_THROTTLE(1,"Autopilot MODE : ON");
+        ROS_WARN_ONCE("ARMED");
         mtr.speed = 1.0;
         mtr.acceleration = 1.0;
 
-        mtr.joint_name = "prop_one";
-        mtr.position =  prop_motor_mapping(RX_received[0]); //-int(89)*M_PI/180;
+        mtr.joint_name = "vet_one";
+        //vet_degree = servo_motor_mapping(RX_received[1]);
+        vet_degree = M_PI/4*sin(vet_T);
+        vet_T += vet_step;
+        /*if(vet_degree <= 0){
+          vet_degree += M_PI/4;
+          vet_degree += vet_step;
+          vet_degree -= M_PI/4;
+        }else if (vet_degree >= M_PI/4){
+          vet_degree = -M_PI/4;
+        }else{
+          vet_degree += vet_step;
+        }*/
+        mtr.position =  vet_degree;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "vet_two";
+        mtr.position =  vet_degree;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "vet_three";
+        mtr.position =  vet_degree;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "vet_four";
+        mtr.position =  vet_degree;
         pub_motor.publish(mtr);
 
+        mtr.joint_name = "leme_one";
+        mtr.position =  vet_degree;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "leme_two";
+        mtr.position =  vet_degree;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "leme_three";
+        mtr.position =  vet_degree;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "leme_four";
+        mtr.position =  vet_degree;
+        pub_motor.publish(mtr);
+
+        mtr.joint_name = "prop_one";
+        //prop_gauge = -M_PI/4+M_PI/4*sin(prop_T);
+        //prop_gauge = M_PI/+M_PI/2*sin(prop_T);
+        prop_gauge = 0.0;
+        prop_T += prop_step;
+        mtr.position =  prop_gauge;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "prop_two";
+        mtr.position =  prop_gauge;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "prop_three";
+        mtr.position =  prop_gauge;
+        pub_motor.publish(mtr);
+        mtr.joint_name = "prop_four";
+        mtr.position =  prop_gauge;
+        pub_motor.publish(mtr);
+
+        /*mtr.joint_name = "prop_one";
+        mtr.position =  prop_motor_mapping(RX_received[0]); //-int(89)*M_PI/180;
+        pub_motor.publish(mtr);
         mtr.joint_name = "prop_two";
         mtr.position =  prop_motor_mapping(RX_received[0]);
         pub_motor.publish(mtr);
@@ -54,9 +117,9 @@ int main(int argc, char **argv)
         pub_motor.publish(mtr);
         mtr.joint_name = "prop_four";
         mtr.position =  prop_motor_mapping(RX_received[0]);
-        pub_motor.publish(mtr);
+        pub_motor.publish(mtr);*/
 
-        mtr.joint_name = "vet_one";
+        /*mtr.joint_name = "vet_one";
         mtr.position =  servo_motor_mapping(RX_received[1]);
         pub_motor.publish(mtr);
         mtr.joint_name = "vet_two";
@@ -67,7 +130,7 @@ int main(int argc, char **argv)
         pub_motor.publish(mtr);
         mtr.joint_name = "vet_four";
         mtr.position =  servo_motor_mapping(RX_received[1]);
-        pub_motor.publish(mtr);
+        pub_motor.publish(mtr);*/
 
         /*mtr.joint_name = "leme_one";
         mtr.position =  0;//servo_motor_mapping(RX_received[2]);
@@ -87,8 +150,14 @@ int main(int argc, char **argv)
         //ROS_INFO_THROTTLE(1, "Position: %d", dummy);
         pub_motor.publish(mtr);
       }
+
       if (commutator == false){
-        ROS_INFO_THROTTLE(1,"autopilot mode : OFF");
+        ROS_INFO_THROTTLE(1,"Autopilot MODE : OFF");
+        /*mtr.joint_name = "vet_three";
+        mtr.position =  servo_motor_mapping(RX_received[1]);
+        vet_degree = mtr.position;
+        pub_motor.publish(mtr);*/
+        //ROS_INFO_THROTTLE(1, "Position: %f", mtr.position);
       }
 
       ros::spinOnce();
@@ -123,7 +192,7 @@ void  RX_received_callback(const yocto::PWM_info::ConstPtr& msg)
 float prop_motor_mapping (float duty_cycle)
 {
     //float m_pi = 3.141592;
-    float rad = (M_PI*duty_cycle/5) - 3*M_PI/2;
+    float rad = -(M_PI*duty_cycle/5) + 3*M_PI/2;
     rad /= 2;
     if(rad > 0){
       rad = -1*(rad + M_PI/4);
@@ -138,7 +207,7 @@ float prop_motor_mapping (float duty_cycle)
 float servo_motor_mapping (float duty_cycle)
 {
   //float m_pi = 3.141592;
-  float rad = (M_PI*duty_cycle/5) - 3*M_PI/2;
+  float rad = -(M_PI*duty_cycle/5) + 3*M_PI/2;
   rad /= 2;
   //ROS_INFO_THROTTLE(1, "rad: %f", rad);
   return rad;
