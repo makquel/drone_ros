@@ -1,0 +1,84 @@
+{
+    "firmwareType": 0,
+    "groundStation": "QGroundControl",
+    "items": [
+        {
+            "autoContinue": true,
+            "command": 22,
+            "coordinate": [
+                -22.851867009999999,
+                -47.127832779999999,
+                50
+            ],
+            "doJumpId": 1,
+            "frame": 0,
+            "params": [
+                15,
+                0,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        },
+        {
+            "autoContinue": true,
+            "command": 16,
+            "coordinate": [
+                -22.851928473761184,
+                -47.128297378614292,
+                50
+            ],
+            "doJumpId": 2,
+            "frame": 0,
+            "params": [
+                0,
+                4,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        },
+        {
+            "autoContinue": true,
+            "command": 16,
+            "coordinate": [
+                -22.851988438404593,
+                -47.128562059400849,
+                50
+            ],
+            "doJumpId": 3,
+            "frame": 0,
+            "params": [
+                0,
+                3,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        },
+        {
+            "autoContinue": true,
+            "command": 16,
+            "coordinate": [
+                -22.852019420010333,
+                -47.128987010836425,
+                50
+            ],
+            "doJumpId": 4,
+            "frame": 0,
+            "params": [
+                0,
+                3,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        }
+    ],
+    "plannedHomePosition": [
+        -22.85183194962913,
+        -47.127659815838825,
+        0
+    ],
+    "version": 2
+}

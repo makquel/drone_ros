@@ -1,0 +1,8 @@
+<launch>
+	<!--param name="device" type="str" value="/dev/ttylightware_altitude" /-->
+	<node pkg="sf11_altimeter" name="altitude_sensor" type="sf11c_node" ><!--output="screen"-->
+		<param name="serial_port" type="string" value="/dev/sensors/sf11" />
+    	<!--param name="serial_port" type="string" value="/dev/ttyUSB0" /-->
+    	<param name="serial_speed" type="int" value="115200" />
+    </node>
+</launch>

@@ -1,0 +1,9 @@
+<launch>
+  <rosparam command="load" file="$(find ros2mav)/config/droni.yaml" />
+  <node pkg="ros2mav" type="ros2att_node" name="ros2att_node" output="screen"/>
+  <node pkg="ros2mav" type="imu2mav_node" name="imu2mav_node" output="screen"/>
+  <node pkg="ros2mav" type="gps2mav_node" name="gps2mav_node" output="screen"/>
+  <node pkg="ros2mav" type="ros2vfr_node" name="ros2vfr_node" output="screen"/>
+  <node pkg="ros2mav" type="soc2mav_node" name="soc2mav_node" output="screen"/>
+  <!--node pkg="ros2mav" type="temp2mav_node" name="temp2mav_node" output="screen"/-->
+</launch>

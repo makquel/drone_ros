@@ -1,0 +1,7 @@
+system_id: 1 
+comp_id: 240
+
+mav_topic: mavlink/from
+
+gps_topic: /fix
+vel_topic: /cmd_vel

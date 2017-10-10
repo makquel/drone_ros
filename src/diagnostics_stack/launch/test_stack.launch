@@ -1,0 +1,85 @@
+<launch>
+  <node pkg="diagnostics_stack" type="diagnostics_node" name="diagnostics_node" output="screen"><!--output="screen"-->
+  </node>
+
+  <!--include file="$(find fakecam)/launch/fakecam_nodelet.launch"/-->
+  <!--include file="$(find esmocv)/launch/640image.launch"/-->
+
+  <include file="$(find fakecam)/launch/fakecam_nodelet.launch"/>
+
+  <!--node pkg="rosaria" name="RosAria" type="RosAria" >
+    <param name="_port" type="string" value="/dev/ttyUSB2" />  
+  </node-->
+
+
+  <include file="$(find sf11_altimeter)/launch/sf11c_node.launch"/>
+  <!--node pkg="sf11_altimeter" name="altitude_sensor" type="sf11c_node" >
+    <param name="serial_port" type="string" value="/dev/sensors/sf11" />
+    <param name="serial_speed" type="int" value="115200" />
+  </node-->
+
+  <include file="$(find droni_airspeed_driver)/launch/airspeed_node.launch"/>  
+  <!--node pkg="droni_airspeed_driver" name="airspeed_sensor" type="airspeed_node" >
+    <param name="serial_port" type="string" value="/dev/sensors/d_airspeed" />
+    <param name="serial_speed" type="int" value="115200" />
+  </node-->
+
+  <node pkg="ros_pololu_servo" type="ros_pololu_servo_node" name="ros_pololu_servo_node" >
+        <param name="pololu_motors_yaml" value="$(find ros_pololu_servo)/launch/droni_motors.yaml" />
+        <param name="port_name" value="/dev/ttyACM0" />
+        <param name="baud_rate" value="115200" />
+        <param name="rate_hz" value="50" />
+        <param name="daisy_chain" value="false" />
+  </node>
+
+  <!--output="screen"-->
+
+  <node pkg="yocto" type="yocto_node" name="yocto_node"><!--output="screen"-->
+  </node>
+
+  <arg name="frame" default="xsens" />
+  <node pkg="mtig_driver" type="mtig_driver_node" name="mtig_driver" respawn="true" ><!--output="screen"-->
+    <!-- Error parameters /-->
+    <param name="roll_error" value="0.2" />
+    <param name="pitch_error" value="0.2" />
+    <param name="yaw_error" value="1.0" />
+    <param name="acc_noise" value="0.00015" />
+    <param name="gyr_noise" value="0.01" />
+
+    <!-- Frame Parameter /-->
+    <param name="frame_id" value="$(arg frame)" />
+
+    <!-- TODO: Sem magnetico /-->
+    <param name="override" value="true"/>
+
+    <!-- Module Setup Parameters /-->
+    <param name="orientation_enabled" value="true"/>
+    <param name="orientation_frequency" value="100"/>
+    <param name="gps_enabled" value="true"/>
+    <param name="gps_frequency" value="20"/>
+    <param name="temperature_enabled" value="true"/>
+    <param name="temperature_frequency" value="20"/>
+    <param name="acceleration_enabled" value="true"/>
+    <param name="acceleration_frequency" value="100"/>
+    <param name="pressure_enabled" value="true"/>
+    <param name="pressure_frequency" value="20"/>
+    <param name="magnetic_enabled" value="true"/>
+    <param name="magnetic_frequency" value="20"/>
+    <param name="altitude_enabled" value="true"/>
+    <param name="altitude_frequency" value="20"/>
+    <param name="velocity_enabled" value="true"/>
+    <param name="velocity_frequency" value="100"/>
+    <param name="gyroscope_enabled" value="true"/>
+    <param name="gyroscope_frequency" value="100"/>
+  </node>
+
+
+
+
+<!--node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/camera/image_mono"/>
+    <param name="autosize" value="true" />
+</node-->
+<!--node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" /-->
+
+</launch>

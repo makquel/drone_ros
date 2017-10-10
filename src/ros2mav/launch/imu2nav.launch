@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="ros2mav" type="imu2mav_node" name="imu2mav_node" output="screen"/>
+</launch>

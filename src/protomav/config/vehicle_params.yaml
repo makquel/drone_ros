@@ -1,0 +1,33 @@
+mav_topic: mavlink/from
+gc_topic: mavlink/to
+gps_topic: /xsens/gps_data
+waypoint_frame: map
+planner_frame: map
+hb_freq: 1.0
+status_freq: 1.0
+system_id: 1
+comp_id: 240
+sensors:
+- xsens
+- hokuyo
+
+orientation_enabled:    true
+gps_enabled:            true
+temperature_enabled:    true
+acceleration_enabled:   true
+pressure_enabled:       true
+magnetic_enabled:       true
+altitude_enabled:       true
+velocity_enabled:       true
+gyroscope_enabled:      true
+laser_enabled:          false
+
+orientation_frequency:  100.0
+gps_frequency:          20.0
+temperature_frequency:  20.0
+acceleration_frequency: 100.0
+pressure_frequency:     50.0
+magnetic_frequency:     20.0
+altitude_frequency:     20.0
+velocity_frequency:     100.0
+gyroscope_frequency:    100.0

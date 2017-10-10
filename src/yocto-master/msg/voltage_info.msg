@@ -1,0 +1,4 @@
+float32 current_value_1
+float32 current_value_2
+float32 current_value_3
+float32 current_value_4

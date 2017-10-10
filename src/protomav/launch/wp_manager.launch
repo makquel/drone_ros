@@ -1,0 +1,9 @@
+<launch>
+  <node pkg="protomav" type="wp_manager" name="wp_manager_node" output="screen" />
+  <param name="wp_frame" value="utm"/>
+  <param name="planner_frame" value="utm"/>
+  <param name="goal_topic" value="move_base/simple_goal"/>
+  
+  <!-- FOR TESTS ONLY /-->
+  <!--node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="1 0 0 0 0 0 1 utm map 100" /-->
+</launch>

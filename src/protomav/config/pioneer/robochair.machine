@@ -1,0 +1,3 @@
+<launch>
+  <machine name="raspberrypi" address="raspberrypi" env-loader="/home/pi/catkin_ws/devel/env.sh" user="pi" password="raspberry" />
+</launch>

@@ -1,0 +1,26 @@
+arduino_address: 192.168.0.10 
+arduino_port: 5060
+
+odom_frame: odom
+odom_topic: odom
+odom_rate: 20.0
+
+cmd_vel_topic: cmd_vel
+map_frame: map
+chair_frame: base_footprint
+base_frame: base_footprint
+
+linear_velocity_scale: 1.0
+angular_velocity_scale: 1.0
+#empirically determined
+radius: 0.3
+
+hector_trajectory_server:
+
+  source_frame_name: base_footprint
+  
+amcl:
+
+  initial_pose_x: -10000.0
+  initial_pose_y: -10000.0
+  

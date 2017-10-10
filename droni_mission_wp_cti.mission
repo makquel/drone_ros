@@ -1,0 +1,102 @@
+{
+    "firmwareType": 0,
+    "groundStation": "QGroundControl",
+    "items": [
+        {
+            "autoContinue": true,
+            "command": 22,
+            "coordinate": [
+                -22.851853736664442,
+                -47.127763161314874,
+                50
+            ],
+            "doJumpId": 1,
+            "frame": 3,
+            "params": [
+                15,
+                0,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        },
+        {
+            "autoContinue": true,
+            "command": 16,
+            "coordinate": [
+                -22.851879428521226,
+                -47.127983177324808,
+                50
+            ],
+            "doJumpId": 2,
+            "frame": 0,
+            "params": [
+                0,
+                5,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        },
+        {
+            "autoContinue": true,
+            "command": 16,
+            "coordinate": [
+                -22.852031892126231,
+                -47.128754713396603,
+                50
+            ],
+            "doJumpId": 3,
+            "frame": 0,
+            "params": [
+                0,
+                5,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        },
+        {
+            "autoContinue": true,
+            "command": 16,
+            "coordinate": [
+                -22.851856352115686,
+                -47.129059973385097,
+                50
+            ],
+            "doJumpId": 4,
+            "frame": 0,
+            "params": [
+                0,
+                5,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        },
+        {
+            "autoContinue": true,
+            "command": 16,
+            "coordinate": [
+                -22.851496114830773,
+                -47.129168803510765,
+                50
+            ],
+            "doJumpId": 5,
+            "frame": 0,
+            "params": [
+                0,
+                4,
+                0,
+                0
+            ],
+            "type": "SimpleItem"
+        }
+    ],
+    "plannedHomePosition": [
+        -22.85183194962913,
+        -47.127659815838825,
+        0
+    ],
+    "version": 2
+}
