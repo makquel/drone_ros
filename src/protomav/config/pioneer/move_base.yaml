@@ -1,6 +1,0 @@
-controller_frequency: 10.0
-planner_frequency: 0.0
-#base_local_planner:  dwa_local_planner/DWAPlannerROS
-base_global_planner: global_planner/GlobalPlanner
-#planner_frequency: 0.2
-

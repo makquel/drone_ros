@@ -1,5 +1,0 @@
-<launch>
-  
-  <node pkg="ros2mav" type="ros2vfr_node" name="ros2vfr_node" output="screen">
-
-</launch>

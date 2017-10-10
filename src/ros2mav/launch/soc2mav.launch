@@ -1,3 +1,0 @@
-<launch>
-  <node pkg="ros2mav" type="soc2mav_node" name="soc2mav_node" output="screen"/>
-</launch>

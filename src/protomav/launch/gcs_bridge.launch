@@ -1,5 +1,0 @@
-<launch>
-  <node pkg="mavros" type="gcs_bridge" name="gcs_bridge" clear_params="true" output="screen">
-		<param name="gcs_url" value="udp://localhost:8001@localhost:14550" />
-  </node>
-</launch>
