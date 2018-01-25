@@ -1,9 +1,0 @@
-<launch>
-    <arg name="output" default="log"/>
-    <arg name="config" default="$(find fakecam)/param/fakecam_small.yaml" />
-  
-    <node pkg="fakecam" type="fakecam_node" name="fakecam" output="$(arg output)">
-        <rosparam command="load" file="$(arg config)" />
-    </node>
-    
-</launch>
