@@ -1,0 +1,8 @@
+float32 frequency_1
+float32 duty_cycle_1
+float32 frequency_2
+float32 duty_cycle_2
+float32 frequency_3
+float32 duty_cycle_3
+float32 frequency_4
+float32 duty_cycle_4

@@ -1,0 +1,4 @@
+<launch>
+   <node pkg="yocto" type="yocto_node" name="yocto_node" output="screen">
+   </node>
+</launch>

@@ -1,0 +1,54 @@
+mtr.joint_name = "vet_one";
+//vet_degree = servo_motor_mapping(RX_received[1]);
+vet_degree = M_PI/4*sin(vet_T);
+vet_T += vet_step;
+/*if(vet_degree <= 0){
+  vet_degree += M_PI/4;
+  vet_degree += vet_step;
+  vet_degree -= M_PI/4;
+}else if (vet_degree >= M_PI/4){
+  vet_degree = -M_PI/4;
+}else{
+  vet_degree += vet_step;
+}*/
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+mtr.joint_name = "vet_two";
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+mtr.joint_name = "vet_three";
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+mtr.joint_name = "vet_four";
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+
+mtr.joint_name = "leme_one";
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+mtr.joint_name = "leme_two";
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+mtr.joint_name = "leme_three";
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+mtr.joint_name = "leme_four";
+mtr.position =  vet_degree;
+pub_motor.publish(mtr);
+
+mtr.joint_name = "prop_one";
+//prop_gauge = -M_PI/4+M_PI/4*sin(prop_T);
+//prop_gauge = M_PI/+M_PI/2*sin(prop_T);
+prop_gauge = 0.0;
+prop_T += prop_step;
+mtr.position =  prop_gauge;
+pub_motor.publish(mtr);
+mtr.joint_name = "prop_two";
+mtr.position =  prop_gauge;
+pub_motor.publish(mtr);
+mtr.joint_name = "prop_three";
+mtr.position =  prop_gauge;
+pub_motor.publish(mtr);
+mtr.joint_name = "prop_four";
+mtr.position =  prop_gauge;
+pub_motor.publish(mtr);

@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="ros2mav" type="ros2att_node" name="ros2att_node" output="screen"/>
+</launch>
